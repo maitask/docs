@@ -7,8 +7,8 @@ Maitask is a modular automation platform. Teams can design, execute, and monitor
 | Component | Repository | Description |
 |-----------|------------|-------------|
 | Engine | [maitask/engine](https://github.com/maitask/engine) | High-performance execution runtime (Rust + Deno Core) that exposes REST and CLI interfaces, enforces package sandboxing, and governs resources. |
-| Registry | [maitask/registry](https://github.com/maitask/registry) | Package registry and distribution service that delivers publishing workflows, search, and storage backends. |
-| Maitask | [maitask/maitask](https://github.com/maitask/maitask) | Web interface for operators to monitor resources, manage packages, and trigger executions. |
+| Plane | [maitask/plane](https://github.com/maitask/plane) | Plane API providing package management, authentication, credits, and Engine aggregation. |
+| Frontend | [maitask/plane-frontend](https://github.com/maitask/plane-frontend) | Web interface for operators to monitor resources, manage packages, and trigger executions. |
 | Desktop | [maitask/desktop](https://github.com/maitask/desktop) | Cross-platform desktop client (Tauri + Next.js) that enables local orchestration and offline execution. |
 | Packages | [maitask/packages](https://github.com/maitask/packages) | Official package collection covering AI, data processing, automation, and integration scenarios. |
 | Examples | [maitask/examples](https://github.com/maitask/examples) | Reference workflows, sample data, and walkthroughs illustrating best practices. |
@@ -24,9 +24,9 @@ Maitask is a modular automation platform. Teams can design, execute, and monitor
 ## Installation Blueprint
 
 1. **Deploy the engine** (Kubernetes or bare-metal) and expose the REST API.
-2. **Provision the registry**, ensuring PostgreSQL, Redis, and object storage (S3-compatible or local filesystem) are available.
+2. **Provision the plane service**, ensuring PostgreSQL, Redis, and object storage (S3-compatible or local filesystem) are available.
 3. **Publish official packages** from the `maitask` registry account.
-4. **Deploy the Maitask application** (Next.js) behind your preferred reverse proxy.
+4. **Deploy the Plane Frontend application** (Next.js) behind your preferred reverse proxy.
 5. **Optional**: distribute the desktop client to end users for local execution scenarios.
 
 ## Documentation Roadmap

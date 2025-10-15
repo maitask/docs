@@ -7,8 +7,8 @@ Maitask 是一套模块化的自动化平台，帮助团队在数分钟内构建
 | 组件 | 仓库 | 说明 |
 |------|------|------|
 | Engine | [maitask/engine](https://github.com/maitask/engine) | 高性能执行引擎（Rust + Deno Core），提供 REST/CLI 接口、包沙箱与资源管理。 |
-| Registry | [maitask/registry](https://github.com/maitask/registry) | 包注册表与分发服务，覆盖发布流程、搜索和多种存储后端。 |
-| Maitask | [maitask/maitask](https://github.com/maitask/maitask) | 面向运维与开发的 Web 界面，负责监控资源、管理包、触发执行。 |
+| Plane | [maitask/plane](https://github.com/maitask/plane) | 控制面 API，负责包管理、认证、Credits 与 Engine 聚合。 |
+| Frontend | [maitask/plane-frontend](https://github.com/maitask/plane-frontend) | 面向运维与开发的 Web 界面，负责监控资源、管理包、触发执行。 |
 | Desktop | [maitask/desktop](https://github.com/maitask/desktop) | 跨平台桌面客户端（Tauri + Next.js），实现本地编排和离线执行。 |
 | Packages | [maitask/packages](https://github.com/maitask/packages) | 官方包集合，涵盖 AI、数据处理、自动化与集成场景。 |
 | Examples | [maitask/examples](https://github.com/maitask/examples) | 参考工作流、示例数据和最佳实践演示。 |
@@ -24,9 +24,9 @@ Maitask 是一套模块化的自动化平台，帮助团队在数分钟内构建
 ## 部署蓝图
 
 1. **部署 Engine**（Kubernetes 或裸机），暴露 REST API。
-2. **搭建 Registry**，配置 PostgreSQL、Redis 与对象存储（S3 兼容或本地文件系统）。
+2. **部署 Plane 服务**，配置 PostgreSQL、Redis 与对象存储（S3 兼容或本地文件系统）。
 3. **发布官方包**，使用 `maitask` 账号在注册表完成发布。
-4. **部署 Maitask 应用**（Next.js），可结合反向代理暴露给内部用户。
+4. **部署 Plane Frontend 应用**（Next.js），可结合反向代理暴露给内部用户。
 5. **可选**：向终端用户分发 Desktop 客户端，实现本地执行场景。
 
 ## 文档规划
