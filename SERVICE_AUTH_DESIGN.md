@@ -7,8 +7,8 @@ Maitask platform uses HMAC-based authentication for secure service-to-service co
 ## Architecture
 
 ```text
-Plane ← Engine
-├─ Header: X-Service-ID: engine-instance-1
+Plane ← Runtime
+├─ Header: X-Service-ID: runtime-instance-1
 ├─ Header: X-Timestamp: 1699264800
 ├─ Header: X-Signature: HMAC-SHA256(secret, service_id + timestamp + request_body)
 └─ Body: { ... }
@@ -27,13 +27,13 @@ Plane validates:
 
 ```bash
 SERVICE_AUTH_ENABLED=true
-SERVICE_SECRETS=engine:your-secure-secret-key-here,scheduler:another-secret-key
+SERVICE_SECRETS=runtime:your-secure-secret-key-here,scheduler:another-secret-key
 ```
 
-**Engine (.env)**:
+**Runtime (.env)**:
 
 ```bash
-SERVICE_ID=engine
+SERVICE_ID=runtime
 SERVICE_SECRET=your-secure-secret-key-here
 ```
 
@@ -47,7 +47,7 @@ SERVICE_SECRET=your-secure-secret-key-here
 
 ### Authentication Flow
 
-1. **Request Signing**: Engine generates HMAC signature using shared secret
+1. **Request Signing**: Runtime generates HMAC signature using shared secret
 2. **Header Injection**: Authentication headers added to all requests
 3. **Signature Validation**: Plane verifies signature using registered secret
 4. **Timestamp Check**: Ensures request freshness

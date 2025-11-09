@@ -6,8 +6,8 @@ Maitask is a modular automation platform. Teams can design, execute, and monitor
 
 | Component | Repository | Description |
 |-----------|------------|-------------|
-| Engine | [maitask/engine](https://github.com/maitask/engine) | High-performance execution runtime (Rust + Deno Core) that exposes REST and CLI interfaces, enforces package sandboxing, and governs resources. |
-| Plane | [maitask/plane](https://github.com/maitask/plane) | Plane API providing package management, authentication, credits, and Engine aggregation. |
+| Runtime | [maitask/runtime](https://github.com/maitask/runtime) | High-performance execution runtime (Rust + Deno Core) that exposes REST and CLI interfaces, enforces package sandboxing, and governs resources. |
+| Plane | [maitask/plane](https://github.com/maitask/plane) | Plane API providing package management, authentication, credits, and Runtime aggregation. |
 | Frontend | [maitask/plane-frontend](https://github.com/maitask/plane-frontend) | Web interface for operators to monitor resources, manage packages, and trigger executions. |
 | Desktop | [maitask/desktop](https://github.com/maitask/desktop) | Cross-platform desktop client (Tauri + Vite.js) that enables local orchestration and offline execution. |
 | Packages | [maitask/packages](https://github.com/maitask/packages) | Official package collection covering AI, data processing, automation, and integration scenarios. |
@@ -15,7 +15,7 @@ Maitask is a modular automation platform. Teams can design, execute, and monitor
 
 ## Key Capabilities
 
-- **Workflow Engine** – Deterministic job scheduling, concurrency controls, streaming outputs, and observability hooks.
+- **Workflow Runtime** – Deterministic job scheduling, concurrency controls, streaming outputs, and observability hooks.
 - **AI Integration** – Native support for GPT-5, Claude Sonnet, Gemini 2.5 Pro, DeepSeek, and local Ollama deployments.
 - **Package Ecosystem** – More than thirty official packages across AI, data processing, communications, and developer tooling, published through the registry.
 - **Security & Governance** – Authentication via JWT or API keys, package signing, rate limiting, audit logs, and configurable storage backends.
@@ -23,7 +23,7 @@ Maitask is a modular automation platform. Teams can design, execute, and monitor
 
 ## Installation Blueprint
 
-1. **Deploy the engine** (Kubernetes or bare-metal) and expose the REST API.
+1. **Deploy the runtime** (Kubernetes or bare-metal) and expose the REST API.
 2. **Provision the plane service**, ensuring PostgreSQL, Redis, and object storage (S3-compatible or local filesystem) are available.
 3. **Publish official packages** from the `maitask` registry account.
 4. **Deploy the Plane Frontend application** (Vite.js) behind your preferred reverse proxy.
