@@ -1,0 +1,51 @@
+# Runtime Configuration
+
+Runtime configuration is loaded from `~/.maitask/config.json` (or `.maitask.json` in development mode).
+
+## Config Structure
+
+```json
+{
+  "workspace_dir": "./workspace",
+  "packages_dir": "./packages",
+  "log_level": "info",
+  "default_timeout": 30,
+  "execution": {
+    "allow_network": true,
+    "allowed_hosts": ["*"],
+    "history_limit": 200,
+    "max_execution_duration_ms": 30000,
+    "max_http_response_bytes": 2097152,
+    "max_input_bytes": 20971520,
+    "http_timeout_secs": 60,
+    "max_memory_mb": 128,
+    "require_credits": true,
+    "require_signature": false,
+    "trusted_keys_file": null
+  },
+  "marketplace": {
+    "url": "https://apps.maitask.com/api/v1",
+    "api_key": null
+  },
+  "workspace": {
+    "auto_cleanup": true,
+    "max_age_hours": 24,
+    "max_executions_per_package": 10
+  },
+  "resource_tier": "basic"
+}
+```
+
+## Environment Variables
+
+- `HTTP_HOST`, `HTTP_PORT`
+- `GRPC_HOST`, `GRPC_PORT`
+- `PLANE_URL`
+- `SERVICE_AUTH_ENABLED`
+- `SERVICE_ID`
+- `SERVICE_SECRET`
+- `RUST_LOG`
+
+## Validation and Defaults
+
+Runtime sanitizes invalid values and enforces safe defaults for timeout, input size, and host allow-list behavior.

@@ -1,0 +1,54 @@
+# Package Development
+
+## Minimal Package Files
+
+- `package.json`
+- `index.js`
+
+## Example `package.json`
+
+```json
+{
+  "name": "@maitask/my-package",
+  "version": "1.0.0",
+  "description": "Example package",
+  "main": "index.js",
+  "maitask": {
+    "type": "module",
+    "category": "utilities"
+  }
+}
+```
+
+## Execute Function Contract
+
+```javascript
+async function execute(input, options, context) {
+  if (!input) {
+    return { success: false, error: 'input is required' }
+  }
+
+  return {
+    success: true,
+    data: input,
+    timestamp: new Date().toISOString()
+  }
+}
+
+execute
+```
+
+## Validation and Test Flow
+
+```bash
+maitask validate ./my-package
+maitask lint ./my-package --format text
+maitask test ./my-package
+```
+
+## Recommended Standards
+
+- validate input explicitly
+- return structured success/error payloads
+- keep single responsibility per package
+- avoid embedding secrets in source code

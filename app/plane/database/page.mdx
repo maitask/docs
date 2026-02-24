@@ -1,0 +1,21 @@
+# Plane Database Schema
+
+Plane uses PostgreSQL with SQLx migrations as the source of truth.
+
+## Core Table Domains
+
+- Identity: `users`, `sessions`, `api_keys`
+- Packages: `user_packages`, `package_versions`, `package_shares`, `package_collaborators`, `package_ratings`, `package_categories`
+- Executions: `executions`
+- Credits: `credits_transactions`
+- Notifications: `notifications`, `notification_recipients`, `notification_events`, `user_notification_preferences`, `notification_configs`
+- Governance: audit and operational tables from migration set
+
+## Principles
+
+- UUID primary keys
+- indexed lookup columns for status, ownership, and created timestamps
+- referential integrity via foreign keys and cascading deletes where required
+- migration-first schema evolution
+
+For exact DDL and constraints, use the active migration files in `plane/migrations`.

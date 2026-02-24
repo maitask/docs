@@ -1,0 +1,32 @@
+# Runtime Security
+
+## Execution Isolation
+
+- Package execution is sandboxed.
+- Workspace paths are isolated per execution.
+- Input and output files remain inside runtime-controlled directories.
+
+## Validation and Static Analysis
+
+Before execution, package metadata and code are validated for:
+
+- naming/version format
+- metadata completeness
+- risky JavaScript patterns
+- policy violations (critical issues block execution)
+
+## Network and Resource Policy
+
+- network allow/deny by execution policy
+- host allow-list enforcement
+- timeout and payload-size limits
+- memory and duration controls by policy and resource tier
+
+## Signature Support
+
+Runtime includes package signing and key generation commands:
+
+- `maitask keygen`
+- `maitask sign`
+
+Optional signature verification can be enforced with `execution.require_signature` and `execution.trusted_keys_file`.

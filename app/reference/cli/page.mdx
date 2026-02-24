@@ -1,0 +1,35 @@
+# CLI Reference
+
+## Core Runtime Commands
+
+- `maitask init`
+- `maitask run <package> [--input] [--config]`
+- `maitask list`
+- `maitask cleanup --max-age-hours <n>`
+- `maitask http --host --port`
+- `maitask grpc --host --port`
+- `maitask serve --http-host --http-port --grpc-host --grpc-port`
+
+## Package Engineering Commands
+
+- `maitask new <name> --category <cat>`
+- `maitask validate [path]`
+- `maitask lint [path] --format text|json`
+- `maitask test [path] [--fail-fast]`
+- `maitask profile <package> --iterations <n>`
+- `maitask debug <package> [--trace]`
+- `maitask deps [path]`
+
+## Security and Output Commands
+
+- `maitask keygen --out <file> --name <name>`
+- `maitask sign --file <file> --key <file> --name <name>`
+- `maitask output --execution-id <id> --adapter <type> --config <json|file> [--data <json|file>]`
+
+## Resource Commands
+
+- `maitask resource stats`
+- `maitask resource set <basic|standard|premium|unlimited>`
+- `maitask resource upgrade`
+- `maitask resource downgrade`
+- `maitask resource auto-scale --enabled <true|false>`

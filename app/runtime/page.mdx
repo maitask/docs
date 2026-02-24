@@ -1,0 +1,27 @@
+# Runtime
+
+Runtime is a Rust execution engine that runs task packages, exposes HTTP and gRPC APIs, and integrates with Plane for package fetch, execution status, and credits.
+
+## Responsibilities
+
+- Package lifecycle and local cache management
+- Sandboxed JavaScript execution
+- Execution queueing and concurrency control
+- Output adapter dispatch
+- Runtime metrics and health probes
+- Plane service integration with HMAC authentication
+
+## CLI and Server Modes
+
+- CLI operations (`run`, `list`, `validate`, `lint`, `test`, `profile`, `deps`)
+- HTTP server (`http` command)
+- gRPC server (`grpc` command)
+- hybrid mode (`serve` command)
+
+## Runtime API Groups
+
+- health and metrics
+- package management and execution
+- execution query/cancel
+- resource tier operations
+- adapter output endpoints

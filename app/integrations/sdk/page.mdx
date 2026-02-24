@@ -1,0 +1,38 @@
+# SDK Guide
+
+## JavaScript / TypeScript
+
+```bash
+npm install @maitask/sdk
+```
+
+```ts
+import { MaitaskClient } from '@maitask/sdk'
+
+const client = new MaitaskClient({
+  planeUrl: 'http://localhost:8001',
+  runtimeUrl: 'http://localhost:8080'
+})
+
+await client.login('user@example.com', 'password')
+const result = await client.runtime.execute('csv-parser', {
+  data: 'name,age\\nAlice,30'
+})
+```
+
+## Python
+
+```bash
+pip install maitask
+```
+
+```python
+from maitask import MaitaskClient
+
+client = MaitaskClient(
+    plane_url="http://localhost:8001",
+    runtime_url="http://localhost:8080"
+)
+client.login("user@example.com", "password")
+result = client.runtime.execute("csv-parser", {"data": "name,age\\nAlice,30"})
+```

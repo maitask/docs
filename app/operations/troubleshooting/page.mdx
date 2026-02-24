@@ -1,0 +1,38 @@
+# Troubleshooting
+
+## Service Startup Failures
+
+```bash
+lsof -i :8080
+lsof -i :8001
+lsof -i :3000
+pg_isready
+redis-cli ping
+```
+
+## Database and Migration Issues
+
+```bash
+cd plane
+sqlx migrate run
+sqlx migrate info
+```
+
+## Authentication Issues
+
+- verify token validity and expiry
+- validate Plane and frontend base URLs
+- verify `JWT_SECRET` and auth environment consistency
+
+## Execution Failures
+
+- verify package installation and version
+- inspect execution status and error payload
+- check Runtime logs with `RUST_LOG=debug`
+- verify credits availability and reservation lifecycle
+
+## Schedule and Workflow Issues
+
+- ensure workflow is active and not draft-only
+- ensure schedule is enabled and `next_run_at` is valid
+- verify event/webhook trigger payload and routing

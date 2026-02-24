@@ -1,0 +1,37 @@
+# Plane API
+
+Plane is the control-plane service for user identity, package registry, execution orchestration, scheduling, workflow orchestration, credits, and notifications.
+
+## Service Responsibilities
+
+- Authentication and authorization
+- Package publish/share/visibility management
+- Execution record persistence and status updates
+- Runtime gateway and orchestration
+- Credits and payment flows
+- Workflow and schedule orchestration
+- Notification management and user preferences
+- Metrics, analytics, and audit logging
+
+## Major Route Groups
+
+- `/auth`
+- `/users`
+- `/packages`
+- `/executions`
+- `/credits`
+- `/payments`
+- `/workflows`
+- `/schedules`
+- `/events`
+- `/runtime`
+- `/adapters`
+- `/notifications`
+- `/analytics`
+- `/stats`
+- `/admin`
+- `/roles`
+- `/organizations`
+- `/ws`
+
+OpenAPI JSON is exposed at `/api-docs/openapi.json` and Swagger UI at `/swagger-ui`.

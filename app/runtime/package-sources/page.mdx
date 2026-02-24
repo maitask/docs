@@ -1,0 +1,21 @@
+# Package Sources
+
+Runtime supports local packages and remote package resolution with Plane integration.
+
+## Supported Installation Paths
+
+1. Local package directories under `~/.maitask/packages`
+2. Runtime install endpoint and CLI install command
+3. Plane-backed package fetch and cache fallback
+
+## Runtime Behavior
+
+- Runtime checks local package cache first.
+- If not found and Plane cache integration is enabled, Runtime fetches from Plane and caches locally.
+- Runtime keeps package metadata and example payloads available through package endpoints.
+
+## Operational Guidance
+
+- Pin package versions in production workflows.
+- Keep local package cache writable and monitored.
+- Use Plane as the authority for published package metadata and distribution policy.

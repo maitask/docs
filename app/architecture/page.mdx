@@ -1,0 +1,25 @@
+# Platform Architecture
+
+## Components
+
+1. **Plane Frontend** (`plane-frontend`)
+2. **Plane API** (`plane`)
+3. **Runtime Engine** (`runtime`)
+4. **PostgreSQL / Redis / Object Storage**
+
+## Request and Execution Flow
+
+1. User signs in through Plane Frontend.
+2. Frontend calls Plane APIs for package metadata, credits, workflows, and executions.
+3. Plane validates identity and permissions, then orchestrates Runtime execution.
+4. Runtime loads package code from local cache or Plane package source.
+5. Runtime executes package in sandbox and returns output status.
+6. Plane persists execution record, credits transactions, notifications, and analytics.
+7. Frontend receives latest state through API polling and WebSocket channels.
+
+## Key Cross-Service Contracts
+
+- **Execution lifecycle**: `pending | running | completed | failed | cancelled | timeout`
+- **Credits lifecycle**: `reserve -> consume/refund`
+- **Service-to-service auth**: HMAC headers for Runtime to Plane requests
+- **Output delivery**: adapter pipeline (`http`, `webhook`, `database`, `file`, `excel`, `http_stream`, `websocket`)

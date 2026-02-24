@@ -1,0 +1,50 @@
+# Runtime HTTP API
+
+## Public Endpoints
+
+- `GET /health`
+- `GET /metrics`
+- `GET /api-docs/openapi.json`
+
+## Package Endpoints
+
+- `GET /packages`
+- `GET /packages/browse`
+- `GET /packages/search?q=<query>&limit=<n>`
+- `POST /packages/install`
+- `GET /packages/{name}`
+- `DELETE /packages/{name}`
+- `POST /packages/{name}`
+- `POST /packages/{name}/execute`
+- `POST /packages/{name}/execute-lb`
+- `GET /packages/{name}/stats`
+
+## Execution Endpoints
+
+- `GET /executions`
+- `GET /executions/stats`
+- `GET /executions/{id}`
+- `DELETE /executions/{id}`
+
+## Resource and Adapter Endpoints
+
+- `GET /runtime/stats`
+- `GET /resources/stats`
+- `PUT /resources/tier`
+- `POST /resources/upgrade`
+- `POST /resources/downgrade`
+- `POST /resources/auto-scale`
+- `GET /adapters`
+- `POST /output`
+
+## Response Envelope
+
+Runtime uses a unified JSON envelope:
+
+```json
+{
+  "success": true,
+  "data": {},
+  "timestamp": "2026-01-01T00:00:00Z"
+}
+```

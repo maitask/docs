@@ -1,0 +1,28 @@
+# Error Handling
+
+## Common HTTP Status Codes
+
+- `400`: request validation failure
+- `401`: unauthenticated or token expired
+- `403`: insufficient permissions
+- `404`: resource not found
+- `409`: conflict
+- `422`: semantic validation failure
+- `429`: rate limit exceeded
+- `500`: internal server error
+
+## Standard Error Payload
+
+```json
+{
+  "success": false,
+  "error": "Descriptive message"
+}
+```
+
+## Integration Practices
+
+- branch retry logic by status code class
+- respect `Retry-After` on `429`
+- refresh tokens on `401`
+- capture execution IDs and request IDs for incident debugging

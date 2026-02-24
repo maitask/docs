@@ -1,0 +1,21 @@
+# FAQ
+
+## Why did my execution fail with authentication errors?
+
+Validate user token (frontend/API) and service HMAC configuration (Runtime to Plane) separately. They are different trust paths.
+
+## Why does a package execute in local but fail in production?
+
+Check runtime execution policy differences: network allow-list, timeout, memory limits, and signature requirements.
+
+## Why are schedules not firing?
+
+Verify schedule enablement, next run timestamp, scheduler service health, and trigger data validity.
+
+## Why are credits not deducted as expected?
+
+Check reserve, consume, and refund transactions for the execution ID in Plane credits history.
+
+## Where should package metadata be managed?
+
+Manage published package metadata in Plane. Runtime should be treated as execution engine and cache layer.

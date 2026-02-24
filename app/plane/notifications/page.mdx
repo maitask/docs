@@ -1,0 +1,31 @@
+# Notifications
+
+Plane notification service persists events and dispatches to configured channels.
+
+## Architecture
+
+- `NotificationManager`: orchestration and dispatch
+- `NotificationStorage`: persistence to PostgreSQL
+- Channel implementations: email, webhook, websocket, plus extensible stubs
+- User preference model per account
+
+## Endpoints
+
+- `GET /notifications/status`
+- `GET /notifications`
+- `POST /notifications`
+- `GET /notifications/preferences`
+- `PUT /notifications/preferences`
+
+## Preference Model
+
+Preferences include:
+
+- enabled flag
+- minimum severity
+- quiet hours
+- timezone and language
+- enabled channels
+- optional channel-specific credentials
+
+All notification events and delivery outcomes are audit-tracked.

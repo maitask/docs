@@ -1,0 +1,34 @@
+# Credits System
+
+## Purpose
+
+Credits represent execution cost and are enforced by Plane during execution orchestration.
+
+## Flow
+
+1. **Reserve** credits before execution starts.
+2. **Consume** actual credits on success.
+3. **Refund** unused or failed execution credits.
+
+## Modes
+
+- `CREDITS_ENABLED=true`, `PAYMENT_ENABLED=false`: free mode
+- `CREDITS_ENABLED=true`, `PAYMENT_ENABLED=true`: commercial mode
+- `CREDITS_ENABLED=false`: unlimited mode
+
+## Cost Model
+
+`total = (base_cost + data_cost) * multiplier + adapter_cost`
+
+Inputs include execution time, payload size, and selected output adapters.
+
+## Ledger
+
+Transactions are persisted for:
+
+- top-up
+- reserve
+- consume
+- refund
+
+Balance snapshots and transaction history are exposed through credits APIs.

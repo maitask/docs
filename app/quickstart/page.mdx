@@ -1,0 +1,55 @@
+# Quick Start
+
+## Prerequisites
+
+- Rust 1.70+
+- Node.js 20+
+- PostgreSQL 14+
+- Redis 7+
+
+## 1. Start Runtime
+
+```bash
+cd runtime
+cargo run -- serve --http-host 0.0.0.0 --http-port 8080
+```
+
+## 2. Start Plane
+
+```bash
+cd plane
+cp .env.example .env
+sqlx migrate run
+cargo run
+```
+
+## 3. Start Plane Frontend
+
+```bash
+cd plane-frontend
+npm install
+npm run dev
+```
+
+Frontend default URL: `http://localhost:3000`
+Plane default URL: `http://localhost:8001`
+Runtime default URL: `http://localhost:8080`
+
+## 4. Verify Health
+
+```bash
+curl http://localhost:8001/health
+curl http://localhost:8080/health
+```
+
+## 5. First Execution
+
+```bash
+curl -X POST http://localhost:8080/packages/install \
+  -H "Content-Type: application/json" \
+  -d '{"package": "csv-parser"}'
+
+curl -X POST http://localhost:8080/packages/csv-parser/execute \
+  -H "Content-Type: application/json" \
+  -d '{"input": {"data": "name,age\\nAlice,30"}}'
+```

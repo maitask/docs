@@ -1,0 +1,22 @@
+# Best Practices
+
+## Runtime and Package Governance
+
+- validate package inputs early and explicitly
+- enforce execution timeout and payload limits
+- use signed packages for production release channels
+- maintain strict allowed-host rules for networked packages
+
+## Plane Governance
+
+- enforce RBAC for admin routes
+- monitor credits reserve/consume/refund anomalies
+- review audit logs for privileged actions
+- isolate API keys by environment and scope
+
+## Reliability
+
+- define retry policies for external adapter targets
+- track execution failure rates and timeout ratios
+- use health probes and metrics endpoints for alerting
+- test workflow and schedule definitions in staging before activation

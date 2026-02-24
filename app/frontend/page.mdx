@@ -1,0 +1,41 @@
+# Plane Frontend
+
+Plane Frontend is a React + Vite console application that manages user and operator interactions with Plane and Runtime.
+
+## Route Domains
+
+Public routes:
+
+- `/`
+- `/products`
+- `/pricing`
+- `/login`
+- `/register`
+
+Console routes:
+
+- `/dashboard`
+- `/packages`
+- `/executions` and `/executions/:id`
+- `/workflows` and `/workflows/:id`
+- `/schedules`, `/schedules/new`, `/schedules/:id`, `/schedules/:id/history`
+- `/playground`
+- `/analytics`, `/usage`, `/uptime` (admin domains)
+- `/credits`, `/billing`
+- `/adapters`
+- `/notifications`
+- `/organizations`, `/roles`
+- `/settings`
+
+## Interaction Model
+
+- Uses token-based auth persisted in browser storage and synced cookie for WebSocket auth.
+- Uses unified API wrappers for Plane and Runtime with timeout, cache deduplication, and normalized error handling.
+- Supports real-time execution updates through Plane WebSocket endpoints.
+- Workflow editor includes trigger, condition, transform, adapter, notification, and completion node types.
+
+## Admin and Access Control
+
+- `PrivateRoute` guards all console pages.
+- Admin-only pages are enforced in both UI navigation and backend authorization.
+- Permission-sensitive actions (package admin, roles, system metrics) require elevated privileges.

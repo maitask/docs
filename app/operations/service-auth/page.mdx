@@ -1,0 +1,39 @@
+# Service-to-Service Authentication
+
+Maitask uses HMAC authentication for trusted Runtime-to-Plane calls.
+
+## Headers
+
+- `X-Service-ID`
+- `X-Timestamp`
+- `X-Signature`
+
+`X-Signature` is generated from `service_id + timestamp + request_body` using shared secret HMAC-SHA256.
+
+## Plane Configuration
+
+```bash
+SERVICE_AUTH_ENABLED=true
+SERVICE_SECRETS=runtime:your-secure-secret,scheduler:another-secret
+```
+
+## Runtime Configuration
+
+```bash
+SERVICE_AUTH_ENABLED=true
+SERVICE_ID=runtime
+SERVICE_SECRET=your-secure-secret
+```
+
+## Validation Rules
+
+1. service ID must be registered
+2. timestamp must be within allowed drift window
+3. signature must match expected HMAC
+
+## Operational Requirements
+
+- use secrets of at least 32 bytes
+- rotate secrets on defined cadence
+- enforce HTTPS for all service calls
+- alert on unknown service IDs and repeated signature failures

@@ -1,0 +1,31 @@
+# Output Adapters
+
+Plane provides adapter orchestration and user-managed adapter configuration for execution outputs.
+
+## Built-in Adapter Types
+
+- `http`
+- `file`
+- `webhook`
+- `database`
+- `excel`
+- `http_stream`
+- `websocket`
+
+## User Adapter Management
+
+Endpoints under `/adapters/user` support:
+
+- create
+- update
+- test
+- set default
+- delete
+
+Adapter types and schemas are discoverable under `/adapters/types`.
+
+## Delivery Model
+
+- Adapter configuration is validated by type.
+- Execution output payloads can include metadata.
+- Retry, timeout, and channel-specific options are supported where applicable.

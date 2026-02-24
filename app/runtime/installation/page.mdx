@@ -1,0 +1,29 @@
+# Runtime Installation and Boot
+
+## Build and Run
+
+```bash
+cd runtime
+cargo build --release
+cargo run -- serve --http-host 0.0.0.0 --http-port 8080
+```
+
+## Server Commands
+
+```bash
+maitask http --host 127.0.0.1 --port 8080
+maitask grpc --host 127.0.0.1 --port 50051
+maitask serve --http-host 127.0.0.1 --http-port 8080 --grpc-host 127.0.0.1 --grpc-port 50051
+```
+
+## Core CLI Commands
+
+- `maitask init`
+- `maitask run <package> [--input <file>] [--config <json|file>]`
+- `maitask list`
+- `maitask validate [path]`
+- `maitask lint [path] --format text|json`
+- `maitask test [path] [--fail-fast]`
+- `maitask profile <package> [--iterations N]`
+- `maitask debug <package> [--trace]`
+- `maitask output --execution-id --adapter --config [--data]`

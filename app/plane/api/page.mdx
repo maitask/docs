@@ -1,0 +1,46 @@
+# Plane API Contract
+
+## Base URL
+
+- Development: `http://localhost:8001`
+- Production: deployment-specific API domain
+
+## Authentication Modes
+
+- **User auth**: bearer token from `/auth/login` or `/auth/register`
+- **API key auth**: token endpoints under `/auth/tokens`
+- **Service auth**: HMAC headers for trusted service calls (Runtime to Plane)
+
+## Core Endpoint Domains
+
+1. `auth`: register, login, refresh, logout, verification, API keys
+2. `users`: profile, account updates, installed package links
+3. `packages`: browse/search/get/publish/update/delete/share/visibility
+4. `executions`: create/get/list/update/cancel and runtime result syncing
+5. `workflows` and `schedules`: lifecycle and manual execution
+6. `credits` and `payments`: balance, reserve/consume/refund, top-up
+7. `notifications`: status, list, create, preferences
+
+## Operational Endpoints
+
+- `GET /health`, `/health/ready`, `/health/live`
+- `GET /metrics`
+- `GET /api-docs/openapi.json`
+- `GET /swagger-ui`
+
+## Response Shape
+
+Plane uses a unified envelope:
+
+```json
+{
+  "success": true,
+  "data": {},
+  "pagination": {
+    "page": 1,
+    "per_page": 20,
+    "total": 100,
+    "total_pages": 5
+  }
+}
+```
