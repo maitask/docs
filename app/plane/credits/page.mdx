@@ -1,34 +1,103 @@
-# Credits System
+# Credits And Payments
 
-## Purpose
+## Scope
 
-Credits represent execution cost and are enforced by Plane during execution orchestration.
+Plane credits provide deterministic execution billing with auditable balance changes and provider-backed top-up flows.
 
-## Flow
+This module covers:
 
-1. **Reserve** credits before execution starts.
-2. **Consume** actual credits on success.
-3. **Refund** unused or failed execution credits.
+- execution billing lifecycle (`reserve` / `consume` / `refund`)
+- user top-up lifecycle (`topup`, webhook completion, history)
+- payment provider capability discovery (`/payments/config`)
+- deployment modes (paid, free, unlimited)
 
-## Modes
+## Core Data Contracts
 
-- `CREDITS_ENABLED=true`, `PAYMENT_ENABLED=false`: free mode
-- `CREDITS_ENABLED=true`, `PAYMENT_ENABLED=true`: commercial mode
-- `CREDITS_ENABLED=false`: unlimited mode
+### User balance state
 
-## Cost Model
+- `credits_balance`: immediately spendable credits
+- `reserved_credits`: credits locked for in-flight executions
+- `total_credits_used`: cumulative consumed credits
 
-`total = (base_cost + data_cost) * multiplier + adapter_cost`
+### Ledger state (`credits_transactions`)
 
-Inputs include execution time, payload size, and selected output adapters.
+Each mutation writes an immutable row with:
 
-## Ledger
+- transaction type
+- deltas (`amount`, `reserved_delta`, `total_used_delta`)
+- optional `execution_id`
+- metadata (provider/session/order identifiers, pricing, debug context)
 
-Transactions are persisted for:
+## Interaction Flows
 
-- top-up
-- reserve
-- consume
-- refund
+### Execution billing
 
-Balance snapshots and transaction history are exposed through credits APIs.
+1. Plane reserves estimated credits before dispatch.
+2. Runtime reports completion and actual usage.
+3. Plane settles using one atomic DB transaction:
+   - success: consume actual usage and release reserve
+   - failure/cancel: release reserve and refund unused amount
+
+### User top-up
+
+1. Frontend loads provider capabilities from `GET /payments/config`.
+2. User selects amount and provider, then calls `POST /credits/topup`.
+3. Paid providers (Stripe/PayPal) return a checkout URL and stay `pending` until webhook completion.
+4. Free/manual paths can complete immediately and return updated balance directly.
+5. Webhook completion updates payment status and applies credits atomically.
+
+## Provider Coverage
+
+- Stripe card checkout
+- Stripe Alipay checkout
+- Stripe WeChat Pay checkout (`wechat_pay.client=web`)
+- PayPal checkout
+- Optional mock provider for local/dev environments
+- Manual top-up behavior when payments are disabled
+
+Provider exposure is runtime-configurable and reflected by `/payments/config`.
+
+## Deployment Modes
+
+### Paid mode
+
+```bash
+CREDITS_ENABLED=true
+PAYMENT_ENABLED=true
+PAYMENT_STRIPE_ALIPAY_ENABLED=true
+PAYMENT_STRIPE_WECHAT_PAY_ENABLED=true
+```
+
+### Free mode
+
+```bash
+CREDITS_ENABLED=true
+PAYMENT_ENABLED=false
+PAYMENT_MOCK_ENABLED=true
+```
+
+### Unlimited mode
+
+```bash
+CREDITS_ENABLED=false
+```
+
+## API Surface
+
+- `GET /credits/balance`
+- `GET /credits/history`
+- `POST /credits/topup`
+- `POST /credits/estimate`
+- `POST /credits/reserve` (service/user context)
+- `POST /credits/consume` (service/user context)
+- `POST /credits/refund` (service/user context)
+- `POST /credits/webhook/stripe`
+- `POST /credits/webhook/paypal`
+
+## Production Checklist
+
+- enforce webhook signature verification in all non-local environments
+- keep payment completion and credit grant in a single transaction
+- enable alerting on repeated webhook failures
+- expose only intended providers through config flags
+- keep free/mock/manual paths disabled in paid production deployments
