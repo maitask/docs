@@ -34,6 +34,18 @@ Console routes:
 - Supports real-time execution updates through Plane WebSocket endpoints.
 - Workflow editor includes trigger, condition, transform, adapter, notification, and completion node types.
 
+## Billing And Credits UX Contract
+
+- Billing and Credits pages dynamically load payment capabilities from `GET /payments/config`.
+- Provider lists are runtime-driven (`stripe`, `paypal`, optional `alipay`, `wechat_pay`) instead of hardcoded.
+- Free mode fallback paths are supported:
+  - `mock` provider when `payment_enabled=false` and `mock_enabled=true`
+  - `manual` provider when `payment_enabled=false` and mock is disabled
+- Credits top-up handles both backend response modes:
+  - checkout redirect when `payment_url` is returned
+  - immediate success when `payment_url` is absent (direct top-up)
+- Config-load failure handling is fail-closed for payment pages to avoid silently switching production behavior.
+
 ## Admin and Access Control
 
 - `PrivateRoute` guards all console pages.

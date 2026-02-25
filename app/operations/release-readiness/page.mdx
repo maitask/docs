@@ -1,0 +1,101 @@
+# Release Readiness
+
+## Objective
+
+Use this checklist as the release gate for Plane Frontend, Plane, Runtime, and Docs.
+
+Release is allowed only when all mandatory checks are complete.
+
+## Environment Validation
+
+### Core environment consistency
+
+- `FRONTEND_BASE_URL` points to the deployed frontend domain.
+- `PLANE_API_URL` and frontend API base config point to the deployed Plane domain.
+- Runtime service auth keys match Plane service auth configuration.
+- JWT and API key settings are aligned across services.
+
+### Payments and credits configuration
+
+- `CREDITS_ENABLED` is explicitly set for the target environment.
+- `PAYMENT_ENABLED` is explicitly set for the target environment.
+- Stripe and PayPal credentials are configured for paid environments.
+- Stripe webhook secret is configured and validated in target environment.
+- Optional wallet toggles are set intentionally:
+  - `PAYMENT_STRIPE_ALIPAY_ENABLED`
+  - `PAYMENT_STRIPE_WECHAT_PAY_ENABLED`
+
+## Build And Test Gate
+
+All commands must pass without errors.
+
+### Plane
+
+```bash
+cd plane
+cargo check
+cargo test
+```
+
+### Plane Frontend
+
+```bash
+cd plane-frontend
+npm run lint
+npm run type-check
+npm run build
+```
+
+### Runtime
+
+```bash
+cd runtime
+cargo check
+cargo test
+```
+
+### Docs
+
+```bash
+cd docs
+npm run typecheck
+npm run build
+```
+
+## Functional Regression Checklist
+
+### Authentication and authorization
+
+- User login and token refresh work in frontend and API.
+- Admin-only endpoints reject non-admin users.
+- Service-auth endpoints reject invalid signatures.
+
+### Execution and credits lifecycle
+
+- Reserve/consume/refund transaction lifecycle is recorded correctly.
+- Failed/cancelled executions release reserved credits correctly.
+- Credits history and balance are consistent after multiple executions.
+
+### Payment and top-up lifecycle
+
+- `/payments/config` returns expected provider matrix per environment.
+- Stripe/PayPal top-up returns checkout URL and transitions via webhook.
+- Free/manual/mock top-up succeeds without checkout URL.
+- Duplicate webhook delivery does not double-credit users.
+
+### Frontend UX and interaction
+
+- Credits and billing pages reflect provider capabilities from backend config.
+- Fallback modes (`mock` / `manual`) are shown correctly when payments are disabled.
+- Payment dialog disallows invalid provider selection during config loading.
+
+## Go / No-Go Decision
+
+`Go` only when:
+
+- all build/test gates pass
+- all mandatory regression checks pass
+- no unresolved high-severity auth/payment/credits issues remain
+- production payment and webhook secrets are verified
+
+Otherwise, `No-Go` and fix blockers before deployment.
