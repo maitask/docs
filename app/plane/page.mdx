@@ -1,6 +1,6 @@
 # Plane API
 
-Plane is the control-plane service for user identity, package registry, execution orchestration, scheduling, workflow orchestration, credits, and notifications.
+Plane is the control-plane service for identity, package registry, execution orchestration, scheduling, workflow orchestration, credits, payments, notifications, and analytics.
 
 ## Service Responsibilities
 
@@ -35,3 +35,14 @@ Plane is the control-plane service for user identity, package registry, executio
 - `/ws`
 
 OpenAPI JSON is exposed at `/api-docs/openapi.json` and Swagger UI at `/swagger-ui`.
+
+## Runtime Integration Notes
+
+- Plane runtime integration supports HTTP and gRPC.
+- In hybrid mode, supported operations use gRPC; selected operations intentionally fallback to HTTP.
+- Runtime load-balancing strategy is configurable (`round_robin`, `least_connections`, `random`, `health_aware`).
+
+## Verification Status (2026-02-25)
+
+- `cargo check`: passed
+- `cargo test`: passed

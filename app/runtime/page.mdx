@@ -9,11 +9,11 @@ Runtime is a Rust execution engine that runs task packages, exposes HTTP and gRP
 - Execution queueing and concurrency control
 - Output adapter dispatch
 - Runtime metrics and health probes
-- Plane service integration with HMAC authentication
+- Plane service integration with HMAC authentication (Runtime -> Plane)
 
 ## CLI and Server Modes
 
-- CLI operations (`run`, `list`, `validate`, `lint`, `test`, `profile`, `deps`)
+- CLI operations (`run`, `list`, `validate`, `lint`, `test`, `profile`, `deps`, etc.)
 - HTTP server (`http` command)
 - gRPC server (`grpc` command)
 - hybrid mode (`serve` command)
@@ -25,3 +25,14 @@ Runtime is a Rust execution engine that runs task packages, exposes HTTP and gRP
 - execution query/cancel
 - resource tier operations
 - adapter output endpoints
+
+## Deployment Boundary
+
+- Runtime HTTP API does not enforce request-level auth by default.
+- Production should keep Runtime in private/internal network zones.
+- Plane should be used as the public control-plane/API boundary.
+
+## Verification Status (2026-02-25)
+
+- `cargo check`: passed
+- `cargo test`: passed

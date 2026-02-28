@@ -6,14 +6,25 @@ Use this checklist as the release gate for Plane Frontend, Plane, Runtime, and D
 
 Release is allowed only when all mandatory checks are complete.
 
+## Current Validation Snapshot (2026-02-25)
+
+Repository-level validation completed:
+
+- `plane-frontend`: `npm run type-check`, `npm run build` passed.
+- `plane`: `cargo check`, `cargo test` passed.
+- `runtime`: `cargo check`, `cargo test` passed.
+
+Implementation analysis is documented in `operations/implementation-audit`.
+
 ## Environment Validation
 
 ### Core environment consistency
 
 - `FRONTEND_BASE_URL` points to the deployed frontend domain.
-- `PLANE_API_URL` and frontend API base config point to the deployed Plane domain.
-- Runtime service auth keys match Plane service auth configuration.
-- JWT and API key settings are aligned across services.
+- Frontend `VITE_PLANE_API_URL` and `VITE_RUNTIME_API_URL` point to deployed services.
+- Runtime service-auth keys match Plane service-auth configuration.
+- JWT/API key settings are aligned across services.
+- Runtime is network-isolated (internal/private) and accessed through Plane in production.
 
 ### Payments and credits configuration
 
@@ -89,6 +100,12 @@ npm run build
 - Fallback modes (`mock` / `manual`) are shown correctly when payments are disabled.
 - Payment dialog disallows invalid provider selection during config loading.
 
+### Runtime connectivity and fallback
+
+- `GET /runtime/test` reports healthy HTTP connectivity.
+- gRPC connectivity check is healthy when gRPC is configured.
+- HTTP fallback paths remain functional for Runtime operations that are not gRPC-backed.
+
 ## Go / No-Go Decision
 
 `Go` only when:
@@ -97,5 +114,6 @@ npm run build
 - all mandatory regression checks pass
 - no unresolved high-severity auth/payment/credits issues remain
 - production payment and webhook secrets are verified
+- Runtime network boundary is enforced
 
 Otherwise, `No-Go` and fix blockers before deployment.

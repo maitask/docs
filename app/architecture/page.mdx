@@ -12,14 +12,28 @@
 1. User signs in through Plane Frontend.
 2. Frontend calls Plane APIs for package metadata, credits, workflows, and executions.
 3. Plane validates identity and permissions, then orchestrates Runtime execution.
-4. Runtime loads package code from local cache or Plane package source.
-5. Runtime executes package in sandbox and returns output status.
-6. Plane persists execution record, credits transactions, notifications, and analytics.
-7. Frontend receives latest state through API polling and WebSocket channels.
+4. Runtime loads package code from local cache and configured package sources.
+5. Runtime executes package in sandbox and returns output/status.
+6. Plane persists execution records, credits transactions, notifications, and analytics.
+7. Frontend receives latest state via API polling and WebSocket channels.
+
+## Runtime Communication Model
+
+- Plane talks to Runtime through `RuntimeGateway`.
+- RuntimeGateway supports:
+  - HTTP
+  - gRPC
+  - hybrid mode (gRPC preferred for supported operations, HTTP fallback where needed)
+
+## Trust Boundary
+
+- Plane is the control-plane boundary exposed to users and external clients.
+- Runtime should be deployed on internal/private network segments.
+- Runtime -> Plane service communication uses HMAC service authentication.
 
 ## Key Cross-Service Contracts
 
 - **Execution lifecycle**: `pending | running | completed | failed | cancelled | timeout`
 - **Credits lifecycle**: `reserve -> consume/refund`
-- **Service-to-service auth**: HMAC headers for Runtime to Plane requests
+- **Service-to-service auth**: HMAC headers for Runtime -> Plane requests
 - **Output delivery**: adapter pipeline (`http`, `webhook`, `database`, `file`, `excel`, `http_stream`, `websocket`)
