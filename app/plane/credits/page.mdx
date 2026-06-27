@@ -73,7 +73,6 @@ PAYMENT_STRIPE_WECHAT_PAY_ENABLED=true
 ```bash
 CREDITS_ENABLED=true
 PAYMENT_ENABLED=false
-PAYMENT_MOCK_ENABLED=true
 ```
 
 ### Unlimited mode
@@ -100,4 +99,4 @@ CREDITS_ENABLED=false
 - keep payment completion and credit grant in a single transaction
 - enable alerting on repeated webhook failures
 - expose only intended providers through config flags
-- keep free/mock/manual paths disabled in paid production deployments
+- keep user credit grants limited to provider webhooks or administrator audit endpoints

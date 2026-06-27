@@ -38,12 +38,8 @@ Console routes:
 
 - Billing and Credits pages dynamically load payment capabilities from `GET /payments/config`.
 - Provider lists are runtime-driven (`stripe`, `paypal`, optional `alipay`, `wechat_pay`) instead of hardcoded.
-- Free-mode fallback paths are supported:
-  - `mock` provider when `payment_enabled=false` and `mock_enabled=true`
-  - `manual` provider when `payment_enabled=false` and mock is disabled
-- Credits top-up handles both backend response modes:
-  - checkout redirect when `payment_url` is returned
-  - immediate success when `payment_url` is absent (direct top-up)
+- When payments are disabled or no provider is configured, user self top-up is unavailable.
+- Credits top-up uses provider checkout redirects; direct credit grants are administrator-only.
 
 ## Access Control
 

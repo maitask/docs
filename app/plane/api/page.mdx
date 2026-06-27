@@ -34,17 +34,16 @@ Response fields used by UI:
 - `supported_card_brands`
 - `supported_providers[]` (`stripe`, `paypal`, optional `alipay`, `wechat_pay`)
 - `payment_enabled`
-- `mock_enabled`
 
 ### Top-up behavior
 
 - Endpoint: `POST /credits/topup`
-- `payment_method` accepts:
-  - provider id (`stripe`, `paypal`, `alipay`, `wechat_pay`, `mock`, `manual`)
+- `payment_method` accepts configured real providers only.
+  - provider id (`stripe`, `paypal`, `alipay`, `wechat_pay`)
   - saved payment method UUID
 - Response behavior:
   - `payment_url` exists: external checkout flow (Stripe/PayPal)
-  - `payment_url` absent: direct credit top-up completion (free/manual/mock modes)
+  - provider webhooks settle successful payments and grant credits
 
 ### Webhook completion
 
