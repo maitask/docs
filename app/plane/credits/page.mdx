@@ -87,9 +87,9 @@ CREDITS_ENABLED=false
 - `GET /credits/history`
 - `POST /credits/topup`
 - `POST /credits/estimate`
-- `POST /credits/reserve` (service/user context)
-- `POST /credits/consume` (service/user context)
-- `POST /credits/refund` (service/user context)
+- `POST /credits/reserve` (service HMAC only)
+- `POST /credits/consume` (service HMAC only)
+- `POST /credits/refund` (service HMAC only)
 - `POST /credits/webhook/stripe`
 - `POST /credits/webhook/paypal`
 

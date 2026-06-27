@@ -59,7 +59,7 @@ Webhook processing requirements:
 
 ### Service-authenticated credit mutations
 
-These endpoints support Runtime->Plane service authentication:
+These endpoints require service-to-service HMAC authentication and an explicit `user_id`:
 
 - `POST /credits/reserve`
 - `POST /credits/consume`
