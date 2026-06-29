@@ -22,6 +22,8 @@ Implementation analysis is documented in `operations/implementation-audit`.
 
 - `FRONTEND_BASE_URL` points to the deployed frontend domain.
 - Frontend `VITE_PLANE_API_URL` and `VITE_RUNTIME_API_URL` point to deployed services.
+- Frontend API URLs are browser-reachable from real clients (not just `localhost` from server-side checks).
+- Plane/Runtime published ports match the frontend API URLs (bind host/port and URL are aligned).
 - Runtime service-auth keys match Plane service-auth configuration.
 - JWT/API key settings are aligned across services.
 - Runtime is network-isolated (internal/private) and accessed through Plane in production.
