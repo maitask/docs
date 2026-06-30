@@ -30,13 +30,11 @@ Implementation analysis is documented in `operations/implementation-audit`.
 
 ### Payments and credits configuration
 
-- `CREDITS_ENABLED` is explicitly set for the target environment.
-- `PAYMENT_ENABLED` is explicitly set for the target environment.
+- Platform policy explicitly sets `credits_enabled` and `payment_enabled` for the target environment.
 - Stripe and PayPal credentials are configured for paid environments.
 - Stripe webhook secret is configured and validated in target environment.
-- Optional wallet toggles are set intentionally:
-  - `PAYMENT_STRIPE_ALIPAY_ENABLED`
-  - `PAYMENT_STRIPE_WECHAT_PAY_ENABLED`
+- Optional wallet policy fields are set intentionally:
+  `payment_stripe_alipay_enabled`, `payment_stripe_wechat_pay_enabled`.
 
 ## Build And Test Gate
 

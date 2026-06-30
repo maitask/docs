@@ -59,27 +59,17 @@ Provider exposure is runtime-configurable and reflected by `/payments/config`.
 
 ## Deployment Modes
 
-### Paid mode
+Credits, payment availability, wallet methods, tier multipliers, starter bonus,
+and billing rates are operational policy. Manage them in Admin -> System ->
+Platform policy or through `GET/PUT /admin/system/policy`.
 
-```bash
-CREDITS_ENABLED=true
-PAYMENT_ENABLED=true
-PAYMENT_STRIPE_ALIPAY_ENABLED=true
-PAYMENT_STRIPE_WECHAT_PAY_ENABLED=true
-```
-
-### Free mode
-
-```bash
-CREDITS_ENABLED=true
-PAYMENT_ENABLED=false
-```
-
-### Unlimited mode
-
-```bash
-CREDITS_ENABLED=false
-```
+- Paid mode: `credits_enabled=true`, `payment_enabled=true`, enable only the
+  intended provider methods, and configure provider credentials as deployment
+  secrets.
+- Credits-only mode: `credits_enabled=true`, `payment_enabled=false`; users run
+  against balances managed by starter bonus, admin grants, and refunds.
+- Unlimited mode: `credits_enabled=false`; execution bypasses reserve/consume
+  enforcement.
 
 ## API Surface
 
@@ -98,5 +88,5 @@ CREDITS_ENABLED=false
 - enforce webhook signature verification in all non-local environments
 - keep payment completion and credit grant in a single transaction
 - enable alerting on repeated webhook failures
-- expose only intended providers through config flags
+- expose only intended providers through platform policy
 - keep user credit grants limited to provider webhooks or administrator audit endpoints
