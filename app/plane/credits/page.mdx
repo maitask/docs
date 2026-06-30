@@ -43,8 +43,8 @@ Each mutation writes an immutable row with:
 1. Frontend loads provider capabilities from `GET /payments/config`.
 2. User selects amount and provider, then calls `POST /credits/topup`.
 3. Paid providers (Stripe/PayPal) return a checkout URL and stay `pending` until webhook completion.
-4. Free/manual paths can complete immediately and return updated balance directly.
-5. Webhook completion updates payment status and applies credits atomically.
+4. Webhook completion updates payment status and applies credits atomically.
+5. Administrator credit grants are separate audited operations and do not use user self-service checkout.
 
 ## Provider Coverage
 
@@ -52,8 +52,6 @@ Each mutation writes an immutable row with:
 - Stripe Alipay checkout
 - Stripe WeChat Pay checkout (`wechat_pay.client=web`)
 - PayPal checkout
-- Optional mock provider for local/dev environments
-- Manual top-up behavior when payments are disabled
 
 Provider exposure is runtime-configurable and reflected by `/payments/config`.
 

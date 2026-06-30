@@ -42,7 +42,12 @@ OpenAPI JSON is exposed at `/api-docs/openapi.json` and Swagger UI at `/swagger-
 - In hybrid mode, supported operations use gRPC; selected operations intentionally fallback to HTTP.
 - Runtime load-balancing strategy is configurable (`round_robin`, `least_connections`, `random`, `health_aware`).
 
-## Verification Status (2026-02-25)
+## Quality Gate
 
-- `cargo check`: passed
-- `cargo test`: passed
+Run before release-impacting Plane changes:
+
+```bash
+cargo fmt --check
+cargo check --locked --all-targets
+cargo test --locked --all-targets
+```

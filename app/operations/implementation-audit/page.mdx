@@ -1,133 +1,83 @@
-# Implementation Audit (Plane Frontend / Plane / Runtime)
+# Implementation Audit
 
 ## Scope
 
-This audit is based on the current repository implementation of:
+This page defines how implementation completeness is reviewed across:
 
 - `plane-frontend`
 - `plane`
 - `runtime`
 
-Validation date: **2026-02-25**
+It is a living release gate, not a historical validation snapshot. A capability
+is considered complete only when code, storage, API contracts, UI behavior,
+tests, documentation, and deployment behavior all match.
 
-## Evidence Snapshot
+## Evidence Requirements
 
-Executed from this workspace:
+Each audited capability must have:
 
-```bash
-# Frontend
-cd plane-frontend
-npm run type-check
-npm run build
+- source implementation in the owning component
+- typed request/response or package input/output contract
+- persistence or runtime state model when data is stored
+- authentication, authorization, ownership, and service-auth checks where needed
+- operator-visible state for operational features
+- test or smoke coverage proportional to risk
+- documentation that describes implemented behavior only
 
-# Plane
-cd ../plane
-cargo check
-cargo test
+## Component Coverage
 
-# Runtime
-cd ../runtime
-cargo check
-cargo test
-```
+### Plane Frontend
 
-Observed results:
+Plane Frontend owns public pages, app shell, ops shell, workflow UX, package
+marketplace, execution views, scheduling, credits, billing, notifications,
+settings, and admin/runtime management screens.
 
-- `plane-frontend`: `type-check` and production build passed.
-- `plane`: `cargo check` passed; unit/integration tests passed (`56 + 55` tests, no failures).
-- `runtime`: `cargo check` passed; tests passed (`27 + 27 + 15` tests, no failures).
+Release criteria:
 
-## Feature Coverage Matrix
+- UI actions map to real Plane APIs
+- all user-facing text is internationalized
+- loading, empty, error, and permission states are implemented
+- admin and user surfaces show only data relevant to that audience
+- runtime and policy management screens reflect persisted backend state
 
-### Plane Frontend (`plane-frontend`)
+### Plane
 
-- Routing and domains:
-  - Public: `/`, `/products`, `/pricing`, `/login`, `/register`
-  - Console: dashboard, packages, executions, workflows, schedules, analytics, credits, billing, adapters, notifications, settings, admin domains
-- Auth/session:
-  - Login/register/logout/refresh wired to Plane auth endpoints
-  - Token persisted in localStorage and synced to cookie for WebSocket auth
-- Runtime and Plane API clients:
-  - Unified `planeFetch`/`runtimeFetch` wrappers with timeout, dedup, response normalization
-  - API groups include packages, executions, credits, payments, schedules, workflows, notifications, admin, analytics
-- Workflow UX:
-  - Node-based editor with trigger/condition/transform/http/package/adapter/notification/delay/switch/group/completion node configs
-- Status: **Implemented and build-verified**
+Plane owns auth, users, packages, executions, credits, payments, schedules,
+workflows, notifications, runtime control, analytics, audit, and admin APIs.
 
-### Plane (`plane`)
+Release criteria:
 
-- API surface:
-  - auth, users, packages, executions, credits, payments, analytics, runtime proxy, schedules, workflows, notifications, admin, organizations, roles, websocket, health/metrics
-- Core subsystems:
-  - PostgreSQL persistence + migrations
-  - Redis-backed/in-memory rate limiting
-  - Credits reserve/consume/refund lifecycle
-  - Payment providers (Stripe/PayPal) with webhook-backed settlement
-  - Scheduler + workflow engine
-  - Runtime gateway with load-balancing strategy and health tracking
-- Integration:
-  - Runtime access via HTTP and gRPC client; selected methods can fallback to HTTP
-- Status: **Implemented and test-verified**
+- APIs use the unified response/error contract
+- credits and payments are transactional and auditable
+- operational policy is stored in system settings and managed through admin API/UI
+- service-auth and ownership checks protect internal mutation routes
+- privileged, billing, package, runtime, and security changes are audit logged
 
-### Runtime (`runtime`)
+### Runtime
 
-- Execution engine:
-  - Package execution, queueing, workspace management, execution history
-  - HTTP API + gRPC API
-  - Pool-based runtime instances
-- Security and policy:
-  - Code analyzer and signature utilities
-  - Execution policy limits in runtime config
-- Plane integration:
-  - HMAC service-auth client used for Runtime -> Plane operations
-- Status: **Implemented and test-verified**
+Runtime owns package execution, worker polling, sandbox policy, adapters,
+release artifacts, update installation, and host-local execution state.
 
-## Cross-Service Interaction Reality
+Release criteria:
 
-Current real interaction chain:
+- package execution uses explicit input/output contracts
+- worker polling and callbacks tolerate retries, restarts, and network loss
+- workspace, network, adapter, and resource policies are enforced in runtime code
+- native release artifacts are verified before installation
+- update status is reported to Plane with actionable failure details
 
-1. User action from `plane-frontend` triggers Plane API calls.
-2. `plane` authenticates request, applies policy/credits logic, and persists execution state.
-3. `plane` delegates execution to `runtime` through `RuntimeGateway`.
-4. `runtime` executes package and returns result; Plane updates execution/credits/notifications.
-5. Frontend gets updates via polling and WebSocket endpoints.
+## Cross-Service Chain
 
-## Confirmed Gaps / Constraints
+The formal execution chain is:
 
-These are real and should be treated explicitly in go-live planning:
+1. Plane Frontend calls Plane APIs.
+2. Plane authenticates, authorizes, applies platform policy, and persists state.
+3. Plane dispatches execution through the Runtime gateway or runtime worker queue.
+4. Runtime executes packages and reports status/results.
+5. Plane settles credits, stores outputs, emits notifications, and exposes state
+   to the frontend.
 
-1. Runtime inbound API auth boundary
-- Runtime HTTP API does not enforce request-level auth by default.
-- Production deployment should keep Runtime internal/private (Plane as the public control plane).
+## Release Verdict
 
-2. gRPC coverage asymmetry in Plane RuntimeGateway
-- Some Runtime operations are gRPC-capable.
-- Some methods still intentionally use HTTP fallback paths.
-
-3. Notification channels
-- Email/webhook/websocket are implemented.
-- Several channels remain stub/extensible placeholders (e.g., SMS/WeChat/DingTalk/Feishu).
-
-## Go-Live Readiness Verdict
-
-Current verdict: **Conditional Go**.
-
-- Core execution, credits, scheduling, workflow, and UI management flows are implemented and validated by build/tests.
-- Go-live is recommended only after release gates in `operations/release-readiness` are completed in target environment (secrets, webhook verification, runtime network boundary, smoke checks).
-
-## Next Release Plan
-
-1. Freeze deployment config
-- Finalize Plane/Runtime/frontend URLs and all auth/payment secrets.
-
-2. Execute staging gate
-- Run full checklist from release-readiness doc, including payment and credits regression paths.
-
-3. Enforce runtime boundary
-- Expose Plane publicly; keep Runtime private/internal only.
-
-4. Production canary
-- Roll out to a small tenant subset, monitor execution failures, credit deltas, payment webhooks, and latency.
-
-5. Full rollout
-- Promote after canary SLO is stable and no critical credit/payment/auth findings remain.
+Do not use this page to declare a permanent go-live status. The release verdict
+belongs to the target-environment checklist in `operations/release-readiness`.

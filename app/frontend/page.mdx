@@ -30,7 +30,8 @@ Console routes:
 ## Interaction Model
 
 - Uses token-based auth persisted in browser storage and synced cookie for WebSocket auth.
-- Uses unified API wrappers for Plane and Runtime with timeout, cache deduplication, and normalized error handling.
+- Uses the Plane API client with timeout, cache deduplication, and normalized error handling.
+- Runtime user workflows are accessed through Plane APIs rather than direct browser access to Runtime.
 - Supports real-time execution updates through Plane WebSocket endpoints.
 - Workflow editor includes trigger, condition, transform, adapter, notification, and completion node types.
 
@@ -47,7 +48,12 @@ Console routes:
 - Admin-only pages are enforced in both UI navigation and backend authorization.
 - Fine-grained permission checks are currently admin-based in frontend guard logic.
 
-## Verification Status (2026-02-25)
+## Quality Gate
 
-- `npm run type-check`: passed
-- `npm run build`: passed
+Run before release-impacting frontend changes:
+
+```bash
+npm run lint
+npm run type-check
+npm run build
+```

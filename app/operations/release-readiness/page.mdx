@@ -6,23 +6,19 @@ Use this checklist as the release gate for Plane Frontend, Plane, Runtime, and D
 
 Release is allowed only when all mandatory checks are complete.
 
-## Current Validation Snapshot (2026-02-25)
-
-Repository-level validation completed:
-
-- `plane-frontend`: `npm run type-check`, `npm run build` passed.
-- `plane`: `cargo check`, `cargo test` passed.
-- `runtime`: `cargo check`, `cargo test` passed.
+## Implementation Review
 
 Implementation analysis is documented in `operations/implementation-audit`.
+Run this checklist for every target environment before release.
 
 ## Environment Validation
 
 ### Core environment consistency
 
 - `FRONTEND_BASE_URL` points to the deployed frontend domain.
-- Frontend `VITE_PLANE_API_URL` and `VITE_RUNTIME_API_URL` point to deployed services.
-- Frontend API URLs are browser-reachable from real clients (not just `localhost` from server-side checks).
+- Frontend `VITE_PLANE_API_URL` points to the deployed Plane API or frontend proxy.
+- Frontend API URLs are browser-reachable from real clients.
+- Runtime access goes through Plane in production; do not expose Runtime as a public browser API.
 - Plane/Runtime published ports match the frontend API URLs (bind host/port and URL are aligned).
 - Runtime service-auth keys match Plane service-auth configuration.
 - JWT/API key settings are aligned across services.
@@ -69,8 +65,8 @@ cargo test
 
 ```bash
 cd docs
-npm run typecheck
 npm run build
+npm run typecheck
 ```
 
 ## Functional Regression Checklist
@@ -91,13 +87,13 @@ npm run build
 
 - `/payments/config` returns expected provider matrix per environment.
 - Stripe/PayPal top-up returns checkout URL and transitions via webhook.
-- Free/manual/mock top-up succeeds without checkout URL.
+- Administrator credit grants are audited and do not use user self-service checkout.
 - Duplicate webhook delivery does not double-credit users.
 
 ### Frontend UX and interaction
 
 - Credits and billing pages reflect provider capabilities from backend config.
-- Fallback modes (`mock` / `manual`) are shown correctly when payments are disabled.
+- User self-service top-up is unavailable when payments are disabled or no provider is configured.
 - Payment dialog disallows invalid provider selection during config loading.
 
 ### Runtime connectivity and fallback
