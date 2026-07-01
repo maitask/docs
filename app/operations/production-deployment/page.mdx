@@ -11,6 +11,11 @@ Do not build source on the production host or Runtime nodes. Runtime is deployed
 as native signed binary artifacts only. It is not built or deployed as a Docker
 image.
 
+Default user executions are queued into the `shared` node pool. The production
+host keeps `runtime-uldsa` in `shared` so newly registered SaaS users can run
+packages without an explicit pool selection. Remote worker nodes can remain in
+`production` or another dedicated pool when workloads opt into that pool.
+
 ## Plane And Frontend
 
 Run the production stack deployment from the build host after `plane` and
@@ -96,6 +101,22 @@ Runtime node checks:
 systemctl is-active maitask-runtime.service
 /var/lib/maitask/runtime/bin/maitask-runtime --version
 journalctl -u maitask-runtime.service --since "15 minutes ago" --no-pager
+```
+
+Plane container to native Runtime checks on the production host:
+
+```bash
+docker compose exec -T plane curl -fsS http://172.27.0.1:8080/health
+curl -fsS http://127.0.0.1:18881/runtime/test
+curl -fsS http://127.0.0.1:18881/runtime/packages
+```
+
+The host firewall must allow the production compose bridge to reach the native
+Runtime listener:
+
+```bash
+ufw allow in on br-516e2ec6a562 from 172.27.0.0/16 to 172.27.0.1 port 8080 proto tcp
+ufw allow in on br-516e2ec6a562 from 172.27.0.0/16 to 172.27.0.1 port 50051 proto tcp
 ```
 
 Plane rollout checks must show:
