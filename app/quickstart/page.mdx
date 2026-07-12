@@ -11,7 +11,8 @@
 
 ```bash
 cd runtime
-cargo run -- serve --http-host 0.0.0.0 --http-port 8080
+MAITASK_PACKAGES_DIR=../packages \
+cargo run --locked -- serve --http-host 127.0.0.1 --http-port 8080
 ```
 
 ## 2. Start Plane
@@ -45,11 +46,8 @@ curl http://localhost:8080/health
 ## 5. First Execution
 
 ```bash
-curl -X POST http://localhost:8080/packages/install \
-  -H "Content-Type: application/json" \
-  -d '{"package": "csv-parser"}'
-
-curl -X POST http://localhost:8080/packages/csv-parser/execute \
-  -H "Content-Type: application/json" \
-  -d '{"input": {"data": "name,age\\nAlice,30"}}'
+cd runtime
+printf '%s' '{"text":"name,age\\nAlice,30"}' \
+  | MAITASK_PACKAGES_DIR=../packages \
+    cargo run --locked -- run @maitask/csv-parser
 ```

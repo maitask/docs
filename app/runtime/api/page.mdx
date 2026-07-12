@@ -1,34 +1,41 @@
 # Runtime HTTP API
 
+Runtime exposes health endpoints publicly and protects operational endpoints
+with service HMAC authentication when `SERVICE_AUTH_ENABLED=true`. Managed
+workers must enable service authentication and remain on private or loopback
+networks; external clients use Plane instead of Runtime directly.
+
 ## Public Endpoints
 
 - `GET /health`
 - `GET /metrics`
-- `GET /api-docs/openapi.json`
+- `GET /api-docs/openapi.json` only in builds compiled with the `openapi`
+  feature
 
-## Package Endpoints
+## Service-Authenticated Endpoints
+
+Package catalog and execution:
 
 - `GET /packages`
 - `GET /packages/browse`
-- `GET /packages/search?q=<query>&limit=<n>`
-- `POST /packages/install`
+- `GET /packages/search?q=<query>&limit=<limit>`
 - `GET /packages/{name}`
 - `DELETE /packages/{name}`
-- `POST /packages/{name}`
+- `GET /packages/{name}/stats`
 - `POST /packages/{name}/execute`
 - `POST /packages/{name}/execute-lb`
-- `GET /packages/{name}/stats`
 
-## Execution Endpoints
+Execution state:
 
 - `GET /executions`
 - `GET /executions/stats`
 - `GET /executions/{id}`
 - `DELETE /executions/{id}`
 
-## Resource and Adapter Endpoints
+Runtime operations:
 
 - `GET /runtime/stats`
+- `GET /engine-pool/stats`
 - `GET /resources/stats`
 - `PUT /resources/tier`
 - `POST /resources/upgrade`
@@ -37,9 +44,40 @@
 - `GET /adapters`
 - `POST /output`
 
+## Service Authentication
+
+Every protected request carries:
+
+- `X-Service-ID`
+- `X-Timestamp`: Unix seconds within five minutes of Runtime time
+- `X-Signature`: lowercase hexadecimal HMAC-SHA256
+
+The signed bytes are the concatenation of service ID, timestamp, and the exact
+HTTP request body. Plane's Runtime gateway generates these headers.
+
+## Execution Request
+
+`POST /packages/{name}/execute` accepts explicit execution input and options.
+Plane may also send package code and metadata inline so Runtime can execute a
+published package without relying on a separate Runtime marketplace.
+
+```json
+{
+  "input": { "text": "0 9 * * 1-5" },
+  "options": { "operation": "parse" },
+  "code": "module.exports.execute = async function (...) { ... }",
+  "version": "0.1.0",
+  "description": "Parse a cron expression",
+  "context": {
+    "user_id": "<user-id>",
+    "workspace_id": "<workspace-id>"
+  }
+}
+```
+
 ## Response Envelope
 
-Runtime uses a unified JSON envelope:
+Runtime returns a stable JSON envelope:
 
 ```json
 {
@@ -48,3 +86,6 @@ Runtime uses a unified JSON envelope:
   "timestamp": "2026-01-01T00:00:00Z"
 }
 ```
+
+Failures set `success` to `false` and return a sanitized `error`. Execution
+results retain the package output contract inside `data`.

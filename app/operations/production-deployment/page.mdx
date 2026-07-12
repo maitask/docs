@@ -2,136 +2,118 @@
 
 ## Environment Roles
 
-- Build host: `mds-nebula`, source path `/data/coding/maitask`.
-- Production host: `uldsa-nebula`, stack path `/data/maitask`.
-- Production domains: `maitask.com` for the frontend and `api.maitask.com` for Plane.
-- Runtime nodes: `runtime-uldsa`, `runtime-eds`, `runtime-uslab`, and `runtime-kr1012`.
+- Development and build host: `mds-internal` by default, with source under
+  `/data/coding/maitask`; use `mds-nebula` when its private alias is reachable.
+- Production Plane and console host: `uldsa` by default, with deployment state
+  under `/data/maitask`; use `uldsa-nebula` only after verifying connectivity.
+- Public hosts: `maitask.com` for the console and `api.maitask.com` for Plane.
+- Managed Runtime nodes: `runtime-uldsa`, `runtime-eds`, `runtime-uslab`, and
+  `runtime-kr1012`.
 
-Do not build source on the production host or Runtime nodes. Runtime is deployed
-as native signed binary artifacts only. It is not built or deployed as a Docker
-image.
-
-Default user executions are queued into the `shared` node pool. The production
-host keeps `runtime-uldsa` in `shared` so newly registered SaaS users can run
-packages without an explicit pool selection. Remote worker nodes can remain in
-`production` or another dedicated pool when workloads opt into that pool.
+Do not build source on production or Runtime worker nodes. Plane and Plane
+Frontend use production container images; managed Runtime workers use signed
+native binaries only. All managed production Runtime nodes consume the default
+`shared` queue unless an execution explicitly targets another pool.
 
 ## Plane And Frontend
 
-Run the production stack deployment from the build host after `plane` and
-`plane-frontend` are committed and clean:
+Run from `/data/coding/maitask` on the build host after both repositories are
+committed and clean:
 
 ```bash
-cd /data/coding/maitask
-scripts/deploy-production-stack.sh --production-host uldsa-nebula
+scripts/deploy-production-stack.sh --production-host uldsa
 ```
 
-The deployment script:
+The script builds and validates both images, validates the Cloudflare Worker
+build, transfers the images, updates production image settings, restarts only
+Plane and Frontend, and runs internal and public smoke checks. Runtime is not
+part of this container deployment.
 
-1. builds Plane and Frontend container images on the build host
-2. validates the Cloudflare Worker build when enabled by the script options
-3. transfers images to the production host
-4. updates `PLANE_IMAGE`, `FRONTEND_IMAGE`, and `IMAGE_TAG` in production `.env`
-5. restarts only the Plane and Frontend compose services
-6. verifies local service health and public domain routing
+## Runtime Release
 
-The script must not deploy Runtime workers.
-
-## Runtime Releases
-
-Build Runtime releases on `mds-nebula`:
+Build and sign the native artifact on the build host:
 
 ```bash
 cd /data/coding/maitask/runtime
 RUNTIME_RELEASE_GLIBC_BASELINE=2.31 \
-RUNTIME_RELEASE_SIGNING_KEY=/data/coding/maitask/.deploy/secrets/runtime-release.ed25519 \
-RUNTIME_RELEASE_SIGNER_NAME="Maitask Runtime Release" \
-scripts/build-release.sh --target x86_64-unknown-linux-gnu --glibc-baseline 2.31
+RUNTIME_RELEASE_SIGNING_KEY=/data/maitask/secrets/runtime-release.ed25519 \
+RUNTIME_RELEASE_SIGNER_NAME='Maitask Release' \
+scripts/build-release.sh --target x86_64-unknown-linux-gnu
 ```
 
-Publish the signed artifact to the production release store:
-
-```bash
-scp dist/maitask-runtime-<version>-x86_64-unknown-linux-gnu.tar.gz \
-  dist/maitask-runtime-<version>-x86_64-unknown-linux-gnu.tar.gz.sig.json \
-  uldsa-nebula:/tmp/
-```
-
-Install the files under:
+The private signing key remains on the build host. Transfer only the release
+archive and signature metadata to the canonical production store:
 
 ```text
 /data/maitask/releases/runtime-artifacts
 ```
 
-Runtime artifacts are served on the Nebula-only release endpoint:
+Keep that directory limited to active Plane-registered artifacts and their
+signature metadata. Register the artifact through Plane with its version,
+target triple, size, compression, SHA-256 digest, signature, and release notes.
+Plane owns the authenticated download URL under
+`https://api.maitask.com/runtime/artifacts/<artifact-id>/download`; do not add a
+separate public Runtime artifact server or copy source to worker nodes.
 
-```text
-http://172.23.22.30:18882/<artifact-name>
+## Runtime Rollout
+
+1. Create a Plane rollout for the selected Runtime IDs.
+2. Confirm every target is drained and has zero active executions.
+3. Runtime downloads the assigned artifact and verifies its size, SHA-256
+   digest, Ed25519 signature, target triple, and archive structure.
+4. Runtime stages the binary atomically, retains the configured backups, and
+   restarts through its configured supervisor.
+5. The restarted process reports completion to Plane and removes staging data.
+
+A completed rollout requires:
+
+- rollout status `completed`
+- every target status `succeeded`
+- every managed node on the released version
+- node status and desired status both `online`
+- `node_pool=shared` and zero active executions
+- `maitask-runtime.service` active on every host
+
+Do not manually replace a Runtime binary or bypass signature verification.
+Rollback uses a new Plane rollout targeting a previous signed artifact.
+
+## Production Release Gate
+
+Run from `plane/` on the build host after repository-local checks have passed:
+
+```bash
+PACKAGE_MATRIX_HTTP_TARGET_URL=http://172.23.22.30:18881/.well-known/maitask/package-regression/health \
+scripts/release-gate.sh \
+  --base-url https://api.maitask.com \
+  --internal-health-url https://api.maitask.com/health \
+  --failover-env-ssh uldsa:/data/maitask/.env \
+  --cleanup-db-ssh uldsa:/data/maitask \
+  --skip-local
 ```
 
-The endpoint must keep directory listing disabled and allow only the Nebula
-runtime network and explicitly approved operator addresses.
+The gate covers Plane API regression, Runtime lease failover, the complete
+official package matrix using controlled fixtures, backup verification, and
+production regression cleanup. Live third-party checks remain optional
+diagnostics.
 
-## Rollout Flow
-
-1. Register the artifact in Plane with version, target triple, URL, SHA256,
-   size, compression, signature JSON, and release metadata.
-2. Create a Plane rollout for selected `RUNTIME_ID` values.
-3. Runtime claims the assigned update only when it is eligible and drained.
-4. Runtime downloads the artifact, verifies SHA256 and Ed25519 signature,
-   stages the binary, replaces the active binary, restarts through systemd, and
-   reports completion to Plane.
-5. Confirm each node reports the target version through Plane and with
-   `maitask-runtime --version`.
-
-## Verification
-
-Mandatory checks after deployment:
+## Final Verification
 
 ```bash
 curl -fsS https://maitask.com/ >/dev/null
 curl -fsS https://api.maitask.com/health >/dev/null
-curl -sS -o /dev/null -w '%{http_code} %{redirect_url}' https://www.maitask.com/
-curl -sS -o /dev/null -w '%{http_code} %{redirect_url}' https://api.maitask.com/api/health
+curl -sS -o /dev/null -w '%{http_code} %{redirect_url}\n' https://www.maitask.com/
+curl -sS -o /dev/null -w '%{http_code}\n' https://api.maitask.com/runtime/nodes
+ssh uldsa 'cd /data/maitask && docker compose ps'
 ```
 
-Runtime node checks:
+Expected results are frontend HTTP 200, `www` HTTP 301 to `maitask.com`, healthy
+Plane dependencies, HTTP 401 for the unauthenticated protected API, and healthy
+production Compose services. Verify each Runtime host separately with:
 
 ```bash
-systemctl is-active maitask-runtime.service
-/var/lib/maitask/runtime/bin/maitask-runtime --version
-journalctl -u maitask-runtime.service --since "15 minutes ago" --no-pager
+sudo systemctl is-active maitask-runtime.service
+sudo -u maitask /var/lib/maitask/runtime/bin/maitask-runtime --version
 ```
 
-Plane container to native Runtime checks on the production host:
-
-```bash
-docker compose exec -T plane curl -fsS http://172.27.0.1:8080/health
-curl -fsS http://127.0.0.1:18881/runtime/test
-curl -fsS http://127.0.0.1:18881/runtime/packages
-```
-
-The host firewall must allow the production compose bridge to reach the native
-Runtime listener:
-
-```bash
-ufw allow in on br-516e2ec6a562 from 172.27.0.0/16 to 172.27.0.1 port 8080 proto tcp
-ufw allow in on br-516e2ec6a562 from 172.27.0.0/16 to 172.27.0.1 port 50051 proto tcp
-```
-
-Plane rollout checks must show:
-
-- rollout status `completed`
-- each target status `succeeded`
-- each runtime node `desired_status=online`
-- each runtime node `last_update_status=succeeded`
-- each runtime node `current_artifact_id` set to the released artifact
-
-## Rollback
-
-Plane and Frontend rollback uses the previous `IMAGE_TAG` retained on the
-production host.
-
-Runtime rollback uses a new Plane rollout targeting the previous signed Runtime
-artifact. Do not manually overwrite Runtime binaries except for emergency
-break-glass recovery.
+Before handoff, the regression cleanup dry-run must report zero users,
+executions, packages, workflows, sessions, and Runtime probe nodes.

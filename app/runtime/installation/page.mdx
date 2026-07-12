@@ -1,29 +1,58 @@
-# Runtime Installation and Boot
+# Runtime Installation
 
-## Build and Run
+## Local Development
+
+Build or run Runtime from source only on a development machine:
 
 ```bash
 cd runtime
-cargo build --release
-cargo run -- serve --http-host 0.0.0.0 --http-port 8080
+cargo build --locked
+cargo run --locked -- serve \
+  --http-host 127.0.0.1 --http-port 8080 \
+  --grpc-host 127.0.0.1 --grpc-port 50051
 ```
 
-## Server Commands
+Use `http` or `grpc` when only one protocol listener is required.
+
+## Managed Linux Workers
+
+Managed Maitask workers use signed native release artifacts installed under
+`/var/lib/maitask/runtime` and supervised by
+`maitask-runtime.service`. Do not build on worker nodes, keep source trees on
+them, or deploy Runtime containers.
+
+Build a release on the development/build host:
 
 ```bash
-maitask http --host 127.0.0.1 --port 8080
-maitask grpc --host 127.0.0.1 --port 50051
-maitask serve --http-host 127.0.0.1 --http-port 8080 --grpc-host 127.0.0.1 --grpc-port 50051
+RUNTIME_RELEASE_GLIBC_BASELINE=2.31 \
+scripts/build-release.sh --target x86_64-unknown-linux-gnu
 ```
 
-## Core CLI Commands
+Install the matching archive with the bundled systemd installer, then configure
+`/etc/maitask/runtime.env`. A managed worker requires stable Plane service
+credentials, a unique `RUNTIME_ID`, `PLANE_WORKER_ENABLED=true`, the intended
+Plane URL, `RUNTIME_NODE_POOL=shared` for the default production queue, and the
+trusted Runtime release public key.
 
-- `maitask init`
-- `maitask run <package> [--input <file>] [--config <json|file>]`
-- `maitask list`
-- `maitask validate [path]`
-- `maitask lint [path] --format text|json`
-- `maitask test [path] [--fail-fast]`
-- `maitask profile <package> [--iterations N]`
-- `maitask debug <package> [--trace]`
-- `maitask output --execution-id --adapter --config [--data]`
+```bash
+sudo systemctl restart maitask-runtime.service
+sudo systemctl is-active maitask-runtime.service
+sudo -u maitask /var/lib/maitask/runtime/bin/maitask-runtime --version
+```
+
+Plane-controlled self-update verifies the artifact identity, digest, signature,
+and target before replacing the active binary. Manual binary replacement is an
+emergency-only recovery path.
+
+## CLI Commands
+
+Runtime exposes the following supported command groups:
+
+- servers: `http`, `grpc`, `serve`
+- package execution: `run`, `list`, `validate`, `lint`, `test`, `profile`,
+  `debug`, `deps`
+- package authoring and signing: `new`, `keygen`, `sign`
+- operations: `init`, `cleanup`, `output`, `resource`
+- release operations: `sign-artifact`, `update-agent`
+
+Use `maitask-runtime <command> --help` for the current typed options.

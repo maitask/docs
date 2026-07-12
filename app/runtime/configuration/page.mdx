@@ -1,8 +1,13 @@
 # Runtime Configuration
 
-Runtime configuration is loaded from `~/.maitask/config.json` (or `.maitask.json` in development mode).
+Runtime keeps execution policy in JSON configuration and deployment identity,
+service endpoints, host paths, and secrets in environment variables.
 
-## Config Structure
+## Configuration Files
+
+Runtime loads `./.maitask.json` when present for local development; otherwise it
+loads `$HOME/.maitask/config.json`. Relative workspace and package paths resolve
+from the global Maitask configuration directory.
 
 ```json
 {
@@ -18,14 +23,11 @@ Runtime configuration is loaded from `~/.maitask/config.json` (or `.maitask.json
     "max_http_response_bytes": 2097152,
     "max_input_bytes": 20971520,
     "http_timeout_secs": 60,
+    "runtime_acquire_timeout_ms": 30000,
     "max_memory_mb": 128,
     "require_credits": true,
     "require_signature": false,
     "trusted_keys_file": null
-  },
-  "marketplace": {
-    "url": "https://apps.maitask.com/api/v1",
-    "api_key": null
   },
   "workspace": {
     "auto_cleanup": true,
@@ -36,16 +38,50 @@ Runtime configuration is loaded from `~/.maitask/config.json` (or `.maitask.json
 }
 ```
 
-## Environment Variables
+`MAITASK_WORKSPACE_DIR` and `MAITASK_PACKAGES_DIR` override the corresponding
+JSON paths. Invalid zero limits are replaced with safe defaults before Runtime
+validates the final configuration.
 
-- `HTTP_HOST`, `HTTP_PORT`
-- `GRPC_HOST`, `GRPC_PORT`
-- `PLANE_URL`
-- `SERVICE_AUTH_ENABLED`
-- `SERVICE_ID`
-- `SERVICE_SECRET`
+## Server And Worker Environment
+
+Core server and Plane integration variables include:
+
+- `HTTP_HOST`, `HTTP_PORT`, `GRPC_HOST`, `GRPC_PORT`
 - `RUST_LOG`
+- `PLANE_WORKER_ENABLED`
+- `PLANE_API_URL`
+- `PLANE_SERVICE_ID`, `PLANE_SERVICE_SECRET`
+- `RUNTIME_ID`, `RUNTIME_PUBLIC_HOST`, `RUNTIME_NODE_POOL`
+- `PLANE_WORKER_MAX_CONCURRENCY`
 
-## Validation and Defaults
+Runtime node polling, heartbeat, lease, rollout, and backoff policy is owned by
+Plane system settings. Do not duplicate those operational policies in worker
+environment files.
 
-Runtime sanitizes invalid values and enforces safe defaults for timeout, input size, and host allow-list behavior.
+## Self-Update Environment
+
+Managed self-update additionally uses:
+
+- `RUNTIME_SELF_UPDATE_ENABLED`
+- `RUNTIME_TARGET_TRIPLE`
+- `RUNTIME_BINARY_PATH`
+- `RUNTIME_UPDATE_STATE_DIR`
+- `RUNTIME_UPDATE_STAGING_DIR`
+- `RUNTIME_UPDATE_BACKUP_DIR`
+- `RUNTIME_UPDATE_RESTART_MODE=supervisor`
+- `RUNTIME_UPDATE_TRUSTED_KEYS` or `RUNTIME_UPDATE_TRUSTED_KEYS_FILE`
+
+Private signing keys never belong on Runtime workers. Workers receive only the
+trusted Ed25519 public key material.
+
+## Network Execution Policy
+
+When `allow_network` is false, package HTTP operations are rejected. When it is
+true, every destination and automatic redirect is checked against
+`allowed_hosts`. Package requests may lower `timeoutMs` and
+`maxResponseBytes`, but cannot raise Runtime policy limits. Exact binary bodies
+use canonical `bodyBase64`; `body` and `bodyBase64` are mutually exclusive.
+
+Use `HTTP_PROXY`, `HTTPS_PROXY`, and `NO_PROXY` only when the worker deployment
+requires an outbound proxy. Keep Plane and private fixture addresses in
+`NO_PROXY` when they must remain on the private network.

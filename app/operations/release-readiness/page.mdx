@@ -1,53 +1,24 @@
 # Release Readiness
 
-## Objective
+Release readiness is established from current source, repository gates, the
+target environment, and a verified backup. Do not use historical validation
+results as evidence for a new release.
 
-Use this checklist as the release gate for Plane Frontend, Plane, Runtime, and Docs.
+## Repository Gates
 
-Release is allowed only when all mandatory checks are complete.
-
-## Implementation Review
-
-Implementation analysis is documented in `operations/implementation-audit`.
-Run this checklist for every target environment before release.
-
-## Environment Validation
-
-### Core environment consistency
-
-- `FRONTEND_BASE_URL` points to the deployed frontend domain.
-- Frontend `VITE_PLANE_API_URL` points to the deployed Plane API or frontend proxy.
-- Frontend API URLs are browser-reachable from real clients.
-- Runtime access goes through Plane in production; do not expose Runtime as a public browser API.
-- Plane/Runtime published ports match the frontend API URLs (bind host/port and URL are aligned).
-- Runtime service-auth keys match Plane service-auth configuration.
-- JWT/API key settings are aligned across services.
-- Runtime is network-isolated (internal/private) and accessed through Plane in production.
-
-### Payments and credits configuration
-
-- Platform policy explicitly sets `credits_enabled` and `payment_enabled` for the target environment.
-- Stripe and PayPal credentials are configured for paid environments.
-- Stripe webhook secret is configured and validated in target environment.
-- Optional wallet policy fields are set intentionally:
-  `payment_stripe_alipay_enabled`, `payment_stripe_wechat_pay_enabled`.
-
-## Build And Test Gate
-
-All commands must pass without errors.
+Run the gates for every changed component.
 
 ### Plane
 
 ```bash
-cd plane
-cargo check
-cargo test
+cargo fmt --check
+cargo check --locked --all-targets
+cargo test --locked --all-targets
 ```
 
 ### Plane Frontend
 
 ```bash
-cd plane-frontend
 npm run lint
 npm run type-check
 npm run build
@@ -56,60 +27,52 @@ npm run build
 ### Runtime
 
 ```bash
-cd runtime
-cargo check
-cargo test
+cargo fmt --check
+cargo check --locked --all-targets
+cargo check --locked --all-targets --no-default-features
+cargo test --locked --all-targets
 ```
 
-### Docs
+### Packages And Docs
+
+Run package-specific tests or archive smoke checks for changed packages. For the
+documentation site:
 
 ```bash
-cd docs
-npm run build
 npm run typecheck
+npm run build
 ```
 
-## Functional Regression Checklist
+## Environment Gate
 
-### Authentication and authorization
+- Repositories are committed and clean on the build host.
+- Plane, Frontend, Runtime, and package contracts agree.
+- Operational policy is persisted through Plane settings and admin API/UI.
+- Secrets, host paths, and endpoints are present only in the intended
+  environment files or secret stores.
+- Runtime nodes point to the intended Plane environment, use the correct node
+  pool, and have zero active executions before rollout.
+- A verified production backup exists before a stateful deployment.
 
-- User login and token refresh work in frontend and API.
-- Admin-only endpoints reject non-admin users.
-- Service-auth endpoints reject invalid signatures.
+## Production Gate
 
-### Execution and credits lifecycle
+Run the formal release gate documented in
+[Production Deployment](/operations/production-deployment). Release is allowed
+only when:
 
-- Reserve/consume/refund transaction lifecycle is recorded correctly.
-- Failed/cancelled executions release reserved credits correctly.
-- Credits history and balance are consistent after multiple executions.
+- Plane API regression passes
+- Runtime lease failover passes
+- every official package matrix case passes
+- the production backup passes checksum and content verification
+- external routing, authentication boundaries, and Compose health pass
+- the cleanup dry-run is zero for every regression target
 
-### Payment and top-up lifecycle
+For frontend changes, also verify the rendered desktop and mobile flows, i18n,
+loading/error states, primary interactions, and browser console health.
 
-- `/payments/config` returns expected provider matrix per environment.
-- Stripe/PayPal top-up returns checkout URL and transitions via webhook.
-- Administrator credit grants are audited and do not use user self-service checkout.
-- Duplicate webhook delivery does not double-credit users.
+## Decision
 
-### Frontend UX and interaction
-
-- Credits and billing pages reflect provider capabilities from backend config.
-- User self-service top-up is unavailable when payments are disabled or no provider is configured.
-- Payment dialog disallows invalid provider selection during config loading.
-
-### Runtime connectivity and fallback
-
-- `GET /runtime/test` reports healthy HTTP connectivity.
-- gRPC connectivity check is healthy when gRPC is configured.
-- HTTP fallback paths remain functional for Runtime operations that are not gRPC-backed.
-
-## Go / No-Go Decision
-
-`Go` only when:
-
-- all build/test gates pass
-- all mandatory regression checks pass
-- no unresolved high-severity auth/payment/credits issues remain
-- production payment and webhook secrets are verified
-- Runtime network boundary is enforced
-
-Otherwise, `No-Go` and fix blockers before deployment.
+Release only with no unresolved security, data-integrity, execution, billing,
+or rollout blocker. Document target-specific exceptions before deployment; do
+not weaken the shared gate or convert a failed mandatory check into an optional
+one.
