@@ -1,6 +1,8 @@
 # Notifications
 
-Plane notification service persists events and dispatches to configured channels.
+Plane persists notification delivery records and dispatches through configured
+channels. It separates user-owned preferences from platform-wide delivery
+operations so a tenant user cannot read another user's notification history.
 
 ## Architecture
 
@@ -9,13 +11,29 @@ Plane notification service persists events and dispatches to configured channels
 - Channel implementations: email, webhook, websocket
 - User preference model per account
 
+## Access Model
+
+- `GET /notifications/status` exposes notification availability; an
+  authenticated request also reflects the caller's preferences.
+- Every authenticated user can read and update only their own notification
+  preferences.
+- Global history, notification dispatch, and channel configuration are platform
+  administrator operations.
+- Execution notification configuration uses the execution's tenant-scoped read
+  or write permission.
+- WebSocket upgrades require authentication. Recipient-bound updates are sent
+  only to the matching user; unbound global updates are platform-admin only.
+
 ## Endpoints
 
-- `GET /notifications/status`
-- `GET /notifications`
-- `POST /notifications`
-- `GET /notifications/preferences`
-- `PUT /notifications/preferences`
+| Endpoint | Access | Purpose |
+| --- | --- | --- |
+| `GET /notifications/status` | Public | Effective notification availability and enabled channel types. |
+| `GET /notifications?limit=20` | Platform administrator | Global delivery audit history. |
+| `POST /notifications` | Platform administrator | Create and dispatch a notification. |
+| `GET`, `PUT /notifications/preferences` | Authenticated user | Read or update the caller's own preferences. |
+| `GET`, `PUT /notifications/execution/{execution_id}` | Tenant-scoped execution permission | Read or update execution delivery configuration. |
+| `/notifications/channels*` | Platform administrator | Manage and test configured delivery channels. |
 
 ## Preference Model
 
@@ -28,4 +46,6 @@ Preferences include:
 - enabled channels
 - optional channel-specific credentials
 
-All notification events and delivery outcomes are audit-tracked.
+All notification events and delivery outcomes are audit-tracked. The console's
+global notification page is intentionally administrator-only; users manage
+their individual delivery preferences from Settings.
