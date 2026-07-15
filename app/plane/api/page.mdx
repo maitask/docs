@@ -11,6 +11,20 @@
 - **API key auth**: token endpoints under `/auth/tokens`
 - **Service auth**: HMAC headers for trusted service calls (Runtime to Plane)
 
+## API Key Scope Contract
+
+Create, rotate, and revoke user-owned API keys through `/auth/tokens`. Send a key with
+`Authorization: ApiKey <key>` or `X-API-Key`. Each key has one effective capability level:
+
+- `read`: read-only operations, including the package search and credit-estimate query endpoints.
+- `write`: read access plus state-changing requests, subject to the endpoint's tenant and resource authorization.
+- `admin`: read and write access plus platform-administrator routes. Only platform administrators can create this level, and the key owner must remain a platform administrator.
+
+Plane enforces the level before a request reaches a handler. Endpoint-specific restrictions
+remain in force; for example, billing, profile, and key-management routes can still reject API-key authentication.
+Existing package-specific key scopes are migrated to the formal level during deployment. New
+keys must use `read`, `write`, or `admin`; choose the lowest level that supports the integration.
+
 ## Core Endpoint Domains
 
 1. `auth`: register, login, refresh, logout, verification, API keys
