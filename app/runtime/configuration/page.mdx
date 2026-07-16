@@ -51,12 +51,16 @@ Core server and Plane integration variables include:
 - `PLANE_WORKER_ENABLED`
 - `PLANE_API_URL`
 - `PLANE_SERVICE_ID`, `PLANE_SERVICE_SECRET`
-- `RUNTIME_ID`, `RUNTIME_PUBLIC_HOST`, `RUNTIME_NODE_POOL`
+- `RUNTIME_ID`, `RUNTIME_PUBLIC_URL`, `RUNTIME_NODE_POOL`
 - `PLANE_WORKER_MAX_CONCURRENCY`
 
 Runtime node polling, heartbeat, lease, rollout, and backoff policy is owned by
 Plane system settings. Do not duplicate those operational policies in worker
-environment files.
+environment files. When Plane performs continuous-job endpoint health checks,
+`RUNTIME_PUBLIC_URL` must be the worker's reachable private-network HTTP(S)
+origin, without credentials or a path (for example,
+`http://172.23.22.30:8080`). It is not a legacy host-only value and must not
+point to a loopback listener that Plane cannot reach.
 
 ## Self-Update Environment
 
