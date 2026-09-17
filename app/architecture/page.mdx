@@ -19,11 +19,10 @@
 
 ## Runtime Communication Model
 
-- Plane talks to Runtime through `RuntimeGateway`.
-- RuntimeGateway supports:
-  - HTTP
-  - gRPC
-  - hybrid mode (gRPC preferred for supported operations, HTTP fallback where needed)
+- Managed worker health comes from `runtime-fleet`.
+- A direct Runtime stats endpoint (`runtime-gateway`) is optional. Its absence
+  is not a collection failure and must not degrade aggregate operations status.
+- Runtime workers poll Plane over the private network, typically through Nebula.
 
 ## Trust Boundary
 

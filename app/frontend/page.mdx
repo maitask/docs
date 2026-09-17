@@ -1,56 +1,59 @@
 # Plane Frontend
 
-Plane Frontend is a React + Vite console application that manages user and operator interactions with Plane and Runtime.
+Plane Frontend is the React + Vite console for Maitask. It owns public pages,
+authentication, the user console, and the platform administration console.
 
 ## Route Domains
 
 Public routes:
 
-- `/`
-- `/products`
-- `/pricing`
-- `/login`
-- `/register`
+- `/`, `/capabilities`, `/pricing`, `/login`, `/register`, `/terms`, `/privacy`
+- `/products` redirects to `/capabilities`
 
-Console routes:
+User console (`/app/*`):
 
-- `/dashboard`
-- `/packages`
-- `/executions` and `/executions/:id`
-- `/workflows` and `/workflows/:id`
-- `/schedules`, `/schedules/new`, `/schedules/:id`, `/schedules/:id/history`
-- `/playground`
-- `/analytics`, `/usage`, `/uptime` (admin domains)
-- `/credits`, `/billing`
-- `/adapters`
-- `/notifications` (platform administrator delivery audit)
-- `/organizations`, `/roles`
-- `/settings`
+- `/app/dashboard`, `/app/packages`, `/app/executions`, `/app/workflows`, `/app/schedules`
+- `/app/adapters`, `/app/analytics`, `/app/playground`
+- `/app/settings`, `/app/notifications`, `/app/organizations`, `/app/roles`
+- `/app/credits`, `/app/billing`, `/app/usage`
+
+Administration console (`/ops/*`, platform administrators only):
+
+- `/ops/users`, `/ops/system`, `/ops/runtime`, `/ops/runtime/releases`
+- `/ops/runtime/queue`, `/ops/runtime/health`, `/ops/websocket`
+- `/ops/audit`, `/ops/security`, `/ops/analytics`, `/ops/roles`, `/ops/uptime`
+
+## Console Shell
+
+- Desktop sidebar is transparent. The header aligns with the sidebar logo row.
+- Header left: feature breadcrumb (current feature path only, no console-kind labels).
+- Header right: language, theme, notifications, and user menu.
+- Content sits on a rounded surface with outer `pb-2 pr-2` spacing.
+- Account, billing, notification, organization, and user-settings pages use an
+  in-content left-menu layout. They are not listed in the main sidebar.
+- The console switch is only in the header user menu, and only for platform
+  administrators.
+- Brand mark is the transparent SVG glyph. Light theme uses deep black `#171719`;
+  dark theme inverts it. Primary color follows that ink.
+- Search fields keep the search icon inside the input. Select triggers are unframed.
 
 ## Interaction Model
 
-- Uses token-based auth persisted in browser storage and synced cookie for WebSocket auth.
-- Uses the Plane API client with timeout, cache deduplication, and normalized error handling.
-- Runtime user workflows are accessed through Plane APIs rather than direct browser access to Runtime.
-- Supports real-time execution updates through Plane WebSocket endpoints.
-- Workflow editor includes trigger, condition, transform, adapter, notification, and completion node types.
+- Token-based auth is persisted in browser storage, with a synced cookie for WebSocket auth.
+- The Plane API client handles timeout, cache deduplication, and normalized errors.
+- Browser workflows talk to Plane APIs, not directly to Runtime.
+- Execution updates arrive through Plane WebSocket endpoints.
+- Tenant actions are gated with `PrivateRoute` and `TenantPermissionRoute`.
+  Administration routes additionally require a platform administrator.
 
-## Billing And Credits UX Contract
+## Billing And Credits
 
-- Billing and Credits pages dynamically load payment capabilities from `GET /payments/config`.
-- Provider lists are runtime-driven (`stripe`, `paypal`, optional `alipay`, `wechat_pay`) instead of hardcoded.
+- Billing and Credits load payment capabilities from `GET /payments/config`.
+- Provider lists are runtime-driven (`stripe`, `paypal`, optional `alipay`, `wechat_pay`).
 - When payments are disabled or no provider is configured, user self top-up is unavailable.
 - Credits top-up uses provider checkout redirects; direct credit grants are administrator-only.
 
-## Access Control
-
-- `PrivateRoute` guards all console pages.
-- Admin-only pages are enforced in both UI navigation and backend authorization.
-- Fine-grained permission checks are currently admin-based in frontend guard logic.
-
 ## Quality Gate
-
-Run before release-impacting frontend changes:
 
 ```bash
 npm run lint

@@ -21,6 +21,7 @@ npm run start
 - `app/`：文档页面与导航元数据
 - `app/layout.tsx`：Nextra 站点布局
 - `theme.config.tsx`：主题与站点配置
+- `public/`：favicon 与透明品牌标志
 
 ## 编写规则
 

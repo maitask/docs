@@ -21,6 +21,7 @@ npm run start
 - `app/`: documentation pages and navigation metadata
 - `app/layout.tsx`: Nextra docs layout
 - `theme.config.tsx`: theme and site configuration
+- `public/`: favicon and transparent brand mark assets
 
 ## Writing Rules
 
