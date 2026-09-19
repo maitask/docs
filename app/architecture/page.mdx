@@ -35,4 +35,4 @@
 - **Execution lifecycle**: `pending | running | completed | failed | cancelled | timeout`
 - **Credits lifecycle**: `reserve -> consume/refund`
 - **Service-to-service auth**: HMAC headers for Runtime -> Plane requests
-- **Output delivery**: adapter pipeline (`http`, `webhook`, `database`, `file`, `excel`, `http_stream`, `websocket`)
+- **Output delivery**: execution adapters (`http`, `webhook`, `database`, `file`, `excel`, `http_stream`, `websocket`) and user bot adapters (`telegram`, `dingtalk`, `feishu`, `discord`, `slack`). Published channel copy is delivered without an execution status header unless `include_execution_header` is enabled.

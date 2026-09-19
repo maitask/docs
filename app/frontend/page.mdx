@@ -42,6 +42,7 @@ Administration console (`/ops/*`, platform administrators only):
 - Token-based auth is persisted in browser storage, with a synced cookie for WebSocket auth.
 - The Plane API client handles timeout, cache deduplication, and normalized errors.
 - Browser workflows talk to Plane APIs, not directly to Runtime.
+- Workflow package nodes render official package option schemas as forms.
 - Execution updates arrive through Plane WebSocket endpoints.
 - Tenant actions are gated with `PrivateRoute` and `TenantPermissionRoute`.
   Administration routes additionally require a platform administrator.

@@ -1,8 +1,31 @@
 # Output Adapters
 
-Plane provides adapter orchestration and user-managed adapter configuration for execution outputs.
+Plane delivers execution results through two adapter surfaces. `GET /adapters/types` is the source of truth for supported types, JSON `config_schema`, and schema defaults.
 
-## Built-in Adapter Types
+## User Bot Adapters
+
+Saved adapters under `/adapters/user` are selected by workflow Adapter nodes. Current bot types:
+
+- `telegram`
+- `dingtalk`
+- `feishu`
+- `discord`
+- `slack`
+
+Management endpoints:
+
+- create, update, test, set default, and delete under `/adapters/user`
+- type schemas under `/adapters/types`
+
+### Published Channel Copy
+
+When the upstream payload already contains published channel copy (`metadata.channel_message` or the equivalent briefing message), bot adapters send that article and omit the execution header (adapter title, status, and generated time). Set `include_execution_header` to `true` only when the operator wants that envelope.
+
+Hacker News Daily copy is a dated title, short lede, numbered stories, and source URLs. It does not include signal-strength labels or AI-availability notices. Telegram defaults to HTML parse mode so titles, links, and source URLs render as readable rich text.
+
+## Execution Output Adapters
+
+Package and execution routing still uses:
 
 - `http`
 - `file`
@@ -12,20 +35,10 @@ Plane provides adapter orchestration and user-managed adapter configuration for 
 - `http_stream`
 - `websocket`
 
-## User Adapter Management
-
-Endpoints under `/adapters/user` support:
-
-- create
-- update
-- test
-- set default
-- delete
-
-Adapter types and schemas are discoverable under `/adapters/types`.
+Submit the complete `output_adapters` array to `POST /adapters/validate` before save. Plane validates the published schema, rejects unknown properties and legacy aliases, and re-resolves public destinations at delivery time.
 
 ## Delivery Model
 
-- Adapter configuration is validated by type.
-- Execution output payloads can include metadata.
-- Retry, timeout, and channel-specific options are supported where applicable.
+- Configuration is closed to the published schema for that type.
+- Retry, timeout, and channel-specific options come from the schema, not a second client-side template.
+- Credentials are redacted on read and restored from stored values when the client sends the configured-secret marker.

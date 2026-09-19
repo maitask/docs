@@ -70,6 +70,12 @@ only when:
 For frontend changes, also verify the rendered desktop and mobile flows, i18n,
 loading/error states, primary interactions, and browser console health.
 
+## Evidence
+
+Treat a capability as complete only when source, storage, API contract, UI
+behavior, tests, and documentation all match the current implementation. Do not
+reuse a previous audit snapshot as evidence for a new release.
+
 ## Decision
 
 Release only with no unresolved security, data-integrity, execution, billing,

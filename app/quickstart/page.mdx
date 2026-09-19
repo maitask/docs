@@ -1,53 +1,37 @@
 # Quick Start
 
-## Prerequisites
+## Local Console Against Development Data
 
-- Rust 1.70+
-- Node.js 20+
-- PostgreSQL 14+
-- Redis 7+
-
-## 1. Start Runtime
+Start local Plane and the console against development PostgreSQL, Redis, MinIO,
+and tenant data. The script retrieves secrets transiently; do not copy those
+values into files, logs, or commits.
 
 ```bash
-cd runtime
-MAITASK_PACKAGES_DIR=../packages \
-cargo run --locked -- serve --http-host 127.0.0.1 --http-port 8080
+scripts/start-local-with-development-data.sh
 ```
 
-## 2. Start Plane
+Default local URLs:
 
-```bash
-cd plane
-cp .env.example .env
-sqlx migrate run
-cargo run
-```
+- Frontend: `http://127.0.0.1:3000`
+- Plane: `http://127.0.0.1:8001`
 
-## 3. Start Plane Frontend
+The development Plane must remain healthy so it retains the distributed
+scheduler lock.
 
-```bash
-cd plane-frontend
-npm install
-npm run dev
-```
+## Isolated Runtime Package Run
 
-Frontend default URL: `http://localhost:3000`
-Plane default URL: `http://localhost:8001`
-Runtime default URL: `http://localhost:8080`
-
-## 4. Verify Health
-
-```bash
-curl http://localhost:8001/health
-curl http://localhost:8080/health
-```
-
-## 5. First Execution
+Runtime workers in managed environments are native binaries. For a local
+package smoke check:
 
 ```bash
 cd runtime
 printf '%s' '{"text":"name,age\\nAlice,30"}' \
   | MAITASK_PACKAGES_DIR=../packages \
     cargo run --locked -- run @maitask/csv-parser
+```
+
+## Verify Health
+
+```bash
+curl -fsS http://127.0.0.1:8001/health
 ```
