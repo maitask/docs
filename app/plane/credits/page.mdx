@@ -34,9 +34,12 @@ Each mutation writes an immutable row with:
 
 1. Plane reserves estimated credits before dispatch.
 2. Runtime reports completion and actual usage.
-3. Plane settles using one atomic DB transaction:
-   - success: consume actual usage and release reserve
+3. Plane extracts model token usage from the standardized package output
+   (`metadata.usage` or `data.usage`) and settles using one atomic DB transaction:
+   - success: consume time, data, adapter, and token usage, then release reserve
    - failure/cancel: release reserve and refund unused amount
+   - child package executions of an agent node settle independently; the parent
+     workflow node does not bill those tokens again
 
 ### User top-up
 
@@ -58,8 +61,9 @@ Provider exposure is runtime-configurable and reflected by `/payments/config`.
 ## Deployment Modes
 
 Credits, payment availability, wallet methods, tier multipliers, starter bonus,
-and billing rates are operational policy. Manage them in Admin -> System ->
-Platform policy or through `GET/PUT /admin/system/policy`.
+time/data/adapter rates, and model token rates are operational policy. Manage
+them in Admin -> System -> Platform policy or through
+`GET/PUT /admin/system/policy`.
 
 - Paid mode: `credits_enabled=true`, `payment_enabled=true`, enable only the
   intended provider methods, and configure provider credentials as deployment

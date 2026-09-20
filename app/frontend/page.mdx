@@ -43,6 +43,9 @@ Administration console (`/ops/*`, platform administrators only):
 - The Plane API client handles timeout, cache deduplication, and normalized errors.
 - Browser workflows talk to Plane APIs, not directly to Runtime.
 - Workflow package nodes render official package option schemas as forms.
+- Workflow agent nodes configure a goal, model credentials, step limit, and an
+  allowlist of published packages. Draft generation proposes a graph for review
+  before the workflow is created.
 - Execution updates arrive through Plane WebSocket endpoints.
 - Tenant actions are gated with `PrivateRoute` and `TenantPermissionRoute`.
   Administration routes additionally require a platform administrator.
