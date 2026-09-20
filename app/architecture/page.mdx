@@ -38,5 +38,6 @@
   step is a child package execution. The node fails closed at the step limit.
 - **Workflow drafts**: `POST /workflows/drafts` proposes a graph from the
   official catalog. Creating the workflow still requires a human confirm.
+  See [Workflows](/plane/workflows).
 - **Service-to-service auth**: HMAC headers for Runtime -> Plane requests
 - **Output delivery**: execution adapters (`http`, `webhook`, `database`, `file`, `excel`, `http_stream`, `websocket`) and user bot adapters (`telegram`, `dingtalk`, `feishu`, `discord`, `slack`). Published channel copy is delivered without an execution status header unless `include_execution_header` is enabled.

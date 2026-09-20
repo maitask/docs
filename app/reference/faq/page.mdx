@@ -15,6 +15,23 @@ Verify schedule enablement, next run timestamp, scheduler service health, and tr
 ## Why are credits not deducted as expected?
 
 Check reserve, consume, and refund transactions for the execution ID in Plane credits history.
+Successful model steps also consume prompt and completion tokens at the platform
+policy rates. Agent child executions settle independently; the parent agent node
+does not bill those tokens again.
+
+## How do I generate a workflow with a model?
+
+Use **Generate draft** in the workflow list or editor. Plane calls
+`POST /workflows/drafts` with the official package catalog. Review the proposed
+graph, then confirm to create or apply it. The request does not create a live
+workflow by itself.
+
+## Why did an agent node fail without producing copy?
+
+Agent nodes fail closed when the API key is missing, the planner returns invalid
+JSON, a selected package is outside the allowlist, or `max_steps` is reached
+before `finish`. Tool failures are returned to the planner as observations;
+planner and credential failures stop the node.
 
 ## Where should package metadata be managed?
 

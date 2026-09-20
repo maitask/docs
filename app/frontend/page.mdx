@@ -56,6 +56,8 @@ Administration console (`/ops/*`, platform administrators only):
 - Provider lists are runtime-driven (`stripe`, `paypal`, optional `alipay`, `wechat_pay`).
 - When payments are disabled or no provider is configured, user self top-up is unavailable.
 - Credits top-up uses provider checkout redirects; direct credit grants are administrator-only.
+- Execution estimates may include expected prompt and completion tokens. Actual
+  settlement uses package `metadata.usage` or `data.usage`.
 
 ## Quality Gate
 

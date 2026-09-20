@@ -1,0 +1,90 @@
+# Workflows
+
+Plane workflows are graphs of typed nodes. Packages, HTTP calls, adapters, and
+the bounded agent loop all execute through the same orchestration and credit
+contracts. Maitask is not a hosted chat-agent product: model calls are package
+or planner steps, and each tool call is a child package execution.
+
+## Node Types
+
+Supported node types:
+
+- Triggers: `trigger-manual`, `trigger-webhook`, `trigger-message`, `trigger-event`
+- Actions: `package`, `agent`, `http`, `adapter`
+- Data: `variable`, `transform`
+- Logic: `condition`, `switch`
+- Flow: `delay`, `notification`, `log`, `completion`
+- Annotation: `group`, `note`
+
+Graph validation accepts an incomplete draft. Publishing requires connected
+triggers and complete configuration for package, HTTP, adapter, notification,
+condition, switch, and agent nodes.
+
+## Package Nodes
+
+Package nodes bind an official package and render `maitask.schemas` as forms.
+Input modes are `upstream`, `mapping`, and `static`. Secrets in package options
+are redacted on read and restored on update.
+
+## Agent Nodes
+
+An agent node is a bounded package-as-tool loop owned by Plane.
+
+Configuration:
+
+- `goal` or `goal_source=upstream`
+- `language`: `zh-CN` or `en`
+- `max_steps`: 1–12
+- `allowed_packages`: 1–16 published packages
+- `ai.apiKey`, optional `ai.baseUrl`, `ai.model`
+- `output.includeSources` and `output.maxCharacters`
+
+Runtime behavior:
+
+1. Each step queues `@maitask/openai` in JSON mode to choose `call_tool`,
+   `finish`, or `fail`.
+2. `call_tool` may use only the allowlist. The selected package runs as a child
+   execution.
+3. `finish` returns sourced published copy in `metadata.channel_message`.
+4. Missing credentials, invalid planner JSON, an unknown package, or the step
+   limit fail closed.
+
+Child executions settle credits, including model tokens. The parent workflow
+node does not bill those tokens again.
+
+Connect a downstream Adapter node to deliver the published copy. Bot adapters
+omit the execution header unless `include_execution_header` is enabled.
+
+## Draft Generation
+
+`POST /workflows/drafts` proposes a graph. It does not create a workflow.
+
+Request:
+
+```json
+{
+  "description": "Search recent sources and send a sourced briefing.",
+  "language": "zh-CN",
+  "ai": {
+    "apiKey": "provider-key",
+    "baseUrl": "https://api.example.com/v1",
+    "model": "gpt-5.5"
+  }
+}
+```
+
+Plane injects the official published catalog and queues
+`@maitask/workflow-composer`. The composer may only name catalog packages and
+must leave secrets, adapter identifiers, and webhook secrets empty. Plane then
+validates the graph.
+
+The console shows the proposed name, description, graph size, notes, and
+warnings. Creating or applying the graph still requires an explicit confirm.
+
+## Credits
+
+`POST /credits/estimate` accepts optional `prompt_tokens` and
+`completion_tokens`. Settlement reads the first matching usage object from
+package output (`metadata.usage` or `data.usage`) and applies platform policy
+rates `credits_prompt_token_rate_per_1k` and
+`credits_completion_token_rate_per_1k`.

@@ -73,12 +73,16 @@ them in Admin -> System -> Platform policy or through
 - Unlimited mode: `credits_enabled=false`; execution bypasses reserve/consume
   enforcement.
 
+Token rates `credits_prompt_token_rate_per_1k` and
+`credits_completion_token_rate_per_1k` belong in the same platform policy. They
+default to `0.02` and `0.06` credits per 1,000 tokens.
+
 ## API Surface
 
 - `GET /credits/balance`
 - `GET /credits/history`
 - `POST /credits/topup`
-- `POST /credits/estimate`
+- `POST /credits/estimate` (optional `prompt_tokens` and `completion_tokens`)
 - `POST /credits/reserve` (service HMAC only)
 - `POST /credits/consume` (service HMAC only)
 - `POST /credits/refund` (service HMAC only)

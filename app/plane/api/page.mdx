@@ -31,9 +31,11 @@ keys must use `read`, `write`, or `admin`; choose the lowest level that supports
 2. `users`: profile, account updates, installed package links
 3. `packages`: browse/search/get/publish/update/delete/share/visibility
 4. `executions`: create/get/list/update/cancel and runtime result syncing
-5. `workflows` and `schedules`: lifecycle, manual execution, and
-   `POST /workflows/drafts` for model-assisted graph proposals
-6. `credits` and `payments`: balance, reserve/consume/refund, top-up
+5. `workflows` and `schedules`: lifecycle, manual execution, agent nodes, and
+   `POST /workflows/drafts` for catalog-backed graph proposals that still require
+   human confirmation
+6. `credits` and `payments`: balance, reserve/consume/refund, top-up, and
+   optional token fields on `POST /credits/estimate`
 7. `notifications`: public status, user-owned preferences, tenant-scoped execution settings, and platform-admin history, dispatch, and channel management
 
 ## Credits And Payments Contract
