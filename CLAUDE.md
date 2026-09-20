@@ -8,6 +8,10 @@ Read workspace `AGENTS.md` first. This file adds documentation-site constraints.
 - Remove stale roadmaps, one-off audit snapshots, and version claims that are
   not continuously verified.
 
+## Git
+
+Follow workspace `AGENTS.md`.
+
 ## Quality Gates
 
 Run from `docs/`:

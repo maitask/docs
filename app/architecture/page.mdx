@@ -12,8 +12,9 @@
 1. User signs in through Plane Frontend.
 2. Frontend calls Plane APIs for package metadata, credits, workflows, and executions.
 3. Plane validates identity and permissions, then orchestrates Runtime execution.
-4. Runtime loads package code from local cache and configured package sources.
-5. Runtime executes package in sandbox and returns output/status.
+4. Plane sends package `code` and `version` inline to a managed Runtime worker.
+   Isolated CLI runs may use a local packages directory instead.
+5. Runtime executes the package in a sandbox and returns output/status.
 6. Plane persists execution records, credits transactions, notifications, and analytics.
 7. Frontend receives latest state via API polling and WebSocket channels.
 

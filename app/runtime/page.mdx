@@ -1,11 +1,11 @@
 # Runtime
 
-Runtime is a Rust execution engine that runs task packages, exposes HTTP and gRPC APIs, and integrates with Plane for package fetch, execution status, and credits.
+Runtime is a Rust execution engine that runs task packages, exposes HTTP and gRPC APIs, and integrates with Plane for queued execution, status, and credits.
 
 ## Responsibilities
 
-- Package lifecycle and local cache management
-- Sandboxed JavaScript execution
+- Sandboxed JavaScript execution of Plane-supplied package code
+- Isolated CLI package runs from a local packages directory
 - Execution queueing and concurrency control
 - Output adapter dispatch
 - Runtime metrics and health probes
@@ -21,7 +21,7 @@ Runtime is a Rust execution engine that runs task packages, exposes HTTP and gRP
 ## Runtime API Groups
 
 - health and metrics
-- package management and execution
+- execution of Plane-supplied package code
 - execution query/cancel
 - resource tier operations
 - adapter output endpoints
