@@ -81,6 +81,14 @@ validates the graph.
 The console shows the proposed name, description, graph size, notes, and
 warnings. Creating or applying the graph still requires an explicit confirm.
 
+## Versions
+
+Saving a graph stores the previous graph in `workflow_versions`.
+`GET /workflows/{id}/versions` lists those snapshots.
+`POST /workflows/{id}/versions/{version}/restore` applies one snapshot, keeps the
+current graph as a new version, and revalidates the graph with the same rules
+as an update. Webhook and node secrets stay on the server.
+
 ## Credits
 
 `POST /credits/estimate` accepts optional `prompt_tokens` and

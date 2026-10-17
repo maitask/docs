@@ -29,7 +29,7 @@ keys must use `read`, `write`, or `admin`; choose the lowest level that supports
 
 1. `auth`: register, login, refresh, logout, verification, API keys
 2. `users`: profile, account updates, installed package links
-3. `packages`: browse/search/get/publish/update/delete/share/visibility
+3. `packages`: browse/search/get/publish/update/delete/share/visibility/ratings
 4. `executions`: create/get/list/update/cancel and runtime result syncing
 5. `workflows` and `schedules`: lifecycle, manual execution, agent nodes, and
    `POST /workflows/drafts` for catalog-backed graph proposals that still require
@@ -54,6 +54,8 @@ Response fields used by UI:
 
 ### Top-up behavior
 
+- `GET /payments` and `GET /payments/stats` use the same organization payment totals as the billing summary. History is paginated. Provider identifiers stay off these responses.
+- `GET /organizations/usage/events` returns events with the standard pagination envelope.
 - Endpoint: `POST /credits/topup`
 - `payment_method` accepts configured real providers only.
   - provider id (`stripe`, `paypal`, `alipay`, `wechat_pay`)

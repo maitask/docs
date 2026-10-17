@@ -57,7 +57,10 @@ Administration console (`/ops/*`, platform administrators only):
 - Billing and Credits load payment capabilities from `GET /payments/config`.
 - Provider lists are runtime-driven (`stripe`, `paypal`, optional `alipay`, `wechat_pay`).
 - When payments are disabled or no provider is configured, user self top-up is unavailable.
-- Credits top-up uses provider checkout redirects; direct credit grants are administrator-only.
+- Credits top-up uses provider checkout redirects; direct credit grants are administrator-only and are issued from `/ops/users`.
+- Billing history pages through `GET /payments` for the whole organization. Usage events page through `GET /organizations/usage/events`, which returns the standard pagination envelope.
+- Settings can create, rotate, and revoke API keys. Rotation revokes the previous key and shows the replacement once.
+- Package details include ratings and reviews. Workflow editors can list and restore saved graph versions.
 - Execution estimates may include expected prompt and completion tokens. Actual
   settlement uses package `metadata.usage` or `data.usage`.
 
