@@ -26,9 +26,11 @@ Build a release on the development/build host:
 ```bash
 RUNTIME_RELEASE_GLIBC_BASELINE=2.31 \
 scripts/build-release.sh --target x86_64-unknown-linux-gnu
+scripts/build-release.sh --target aarch64-unknown-linux-gnu
 ```
 
-Install the matching archive with the bundled systemd installer, then configure
+Install the archive whose target triple matches the host, then set
+`RUNTIME_TARGET_TRIPLE` to that triple and configure
 `/etc/maitask/runtime.env`. A managed worker requires stable Plane service
 credentials, a unique `RUNTIME_ID`, `PLANE_WORKER_ENABLED=true`, the intended
 Plane URL, `RUNTIME_NODE_POOL=shared` for the default production queue, and the

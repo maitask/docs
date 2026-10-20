@@ -7,12 +7,14 @@
 - Production Plane and console host: `uldsa` by default, with deployment state
   under `/data/maitask`; use `uldsa-nebula` only after verifying connectivity.
 - Public hosts: `maitask.com` for the console and `api.maitask.com` for Plane.
-- Managed Runtime nodes: `runtime-uldsa`, `runtime-eds`, and `runtime-kr1012`.
+- Managed Runtime nodes, all in `node_pool=shared`: `runtime-uldsa`,
+  `runtime-uldsb`, `runtime-bds`, `runtime-kr1012`, and `runtime-kr1038`
+  (`x86_64-unknown-linux-gnu`); `runtime-kr0912`
+  (`aarch64-unknown-linux-gnu`).
 
 Do not build source on production or Runtime worker nodes. Plane and Plane
-Frontend use production container images; managed Runtime workers use signed
-native binaries only. All managed production Runtime nodes consume the default
-`shared` queue unless an execution explicitly targets another pool.
+Frontend use production container images. Managed Runtime workers use signed
+native binaries and download only the artifact for their target triple.
 
 ## Plane And Frontend
 
@@ -34,25 +36,19 @@ Build and sign the native artifact on the build host:
 
 ```bash
 cd /data/coding/maitask/runtime
-RUNTIME_RELEASE_GLIBC_BASELINE=2.31 \
-RUNTIME_RELEASE_SIGNING_KEY=/data/maitask/secrets/runtime-release.ed25519 \
-RUNTIME_RELEASE_SIGNER_NAME='Maitask Release' \
+export RUNTIME_RELEASE_GLIBC_BASELINE=2.31
+export RUNTIME_RELEASE_SIGNING_KEY=/data/maitask/secrets/runtime-release-20260716/runtime-release.ed25519
+export RUNTIME_RELEASE_SIGNER_NAME='Maitask Release'
 scripts/build-release.sh --target x86_64-unknown-linux-gnu
+scripts/build-release.sh --target aarch64-unknown-linux-gnu
 ```
 
-The private signing key remains on the build host. Transfer only the release
-archive and signature metadata to the canonical production store:
-
-```text
-/data/maitask/releases/runtime-artifacts
-```
-
-Keep that directory limited to active Plane-registered artifacts and their
-signature metadata. Register the artifact through Plane with its version,
-target triple, size, compression, SHA-256 digest, signature, and release notes.
-Plane owns the authenticated download URL under
-`https://api.maitask.com/runtime/artifacts/<artifact-id>/download`; do not add a
-separate public Runtime artifact server or copy source to worker nodes.
+Use the release key whose public key the workers already trust. Register each
+archive through Plane with
+its version, target triple, size, compression, SHA-256 digest, signature, and
+release notes. Plane stores the bytes and serves
+`/runtime/artifacts/<artifact-id>/download`. Do not add another artifact server
+or copy source to worker nodes.
 
 ## Runtime Rollout
 
