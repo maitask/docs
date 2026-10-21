@@ -67,6 +67,10 @@ time/data/adapter rates, and model token rates are operational policy. Manage
 them in Admin -> System -> Platform policy or through
 `GET/PUT /admin/system/policy`.
 
+`plans.included_credits` is the catalog figure shown on the pricing page. Free
+is 500. Registration does not deposit that figure. A new organization receives
+`credits_starter_bonus` from platform policy, which defaults to 100.
+
 - Paid mode: `credits_enabled=true`, `payment_enabled=true`, enable only the
   intended provider methods, and configure provider credentials as deployment
   secrets.

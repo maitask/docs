@@ -7,14 +7,14 @@ authentication, the user console, and the platform administration console.
 
 Public routes:
 
-- `/`, `/capabilities`, `/pricing`, `/login`, `/register`, `/terms`, `/privacy`
+- `/`, `/capabilities`, `/pricing`, `/playground`, `/login`, `/register`, `/terms`, `/privacy`
 - `/products` redirects to `/capabilities`
+- `/playground` stays public. Signed-in users run a package in their workspace. Signed-out visitors can preview a published package and a sample input.
 
 User console (`/app/*`):
 
 - `/app/dashboard`, `/app/packages`, `/app/executions`, `/app/workflows`, `/app/schedules`
 - `/app/adapters`, `/app/analytics`
-- `/playground` is a public page. Signed-in users run packages in their workspace; signed-out visitors can preview published packages and sample inputs.
 - `/app/settings`, `/app/notifications`, `/app/organizations`, `/app/roles`
 - `/app/credits`, `/app/billing`, `/app/usage`
 
@@ -36,12 +36,24 @@ Administration console (`/ops/*`, platform administrators only):
   administrators. It shows the other side as Admin or Console.
 - Brand mark is the transparent SVG glyph. Light theme uses deep black `#171719`;
   dark theme inverts it. Primary color follows that ink.
+- Content and account panes use `p-4 sm:p-6`.
+- User-console groups are Overview, Tasks, and Records. Item labels are
+  Packages, Workflows, Runs, and Schedules. The user console hides runtime
+  hosts, runtime identifiers, worker claim logs, and package implementation
+  details. Administration pages keep them.
 - Search fields keep the search icon inside the input. Text inputs, textareas, and select triggers are bordered by default. A toolbar control sets `bordered={false}`.
-- Public pages share one header and footer. On small screens the brand stays on
-  the left and the menu or language/theme controls stay on the right. A signed-in
-  header shows the avatar, display name, and workspace credit
-  balance, with a content-width menu for the console, account, and sign-out.
-  Signed-out visitors see sign-in and sign-up.
+- Light theme borders and inputs are `#ededf2`. Dark theme borders and inputs are `#18181b`.
+
+## Public Pages
+
+Home, capabilities, pricing, playground, terms, and privacy share one header and footer.
+
+- The header is a centered glass capsule. It is transparent at the top of the page and frosted when the page scrolls or the mobile menu opens. Navigation text is one step above small body text. The items are How to use it (`/capabilities`), Playground (`/playground`), and Pricing (`/pricing`).
+- On small screens the brand stays on the left and the menu or language/theme controls stay on the right. A signed-in header shows the avatar, display name, and workspace credit balance, with a menu for the console, account, and sign-out. Signed-out visitors see sign-in and sign-up.
+- The footer element has no top border. Copyright and the language/theme controls stay on one row.
+- Home and capabilities describe a repeated task: choose it, run it or schedule it, and keep the result. Cards are borderless and staggered. The only canvas is the full-viewport background.
+- The pricing headline is “Pay for execution, not seats”. Plans are borderless staggered cards, with a wider gap under the introduction. Runtime capacity is shown as run slots. The page explains credits. The amount deposited at registration is the platform-policy starter bonus, not the plan catalog's included-credit figure.
+- Playground is a workbench on the normal page column. It has no page title. From a wide layout the input is on the left and the result stays visible beside it. The example action is 试跑 / “Try it”. The run button is 试跑 / “Try”.
 
 ## Interaction Model
 
