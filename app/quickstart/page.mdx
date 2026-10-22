@@ -12,8 +12,9 @@ scripts/start-local-with-development-data.sh
 
 Default local URLs:
 
-- Frontend: `http://127.0.0.1:3000`
-- Plane: `http://127.0.0.1:8001`
+- Frontend: `http://127.0.0.1:18180`
+- Plane: `http://127.0.0.1:18181`
+- Runtime HTTP: `http://127.0.0.1:18182`
 
 The development Plane must remain healthy so it retains the distributed
 scheduler lock.
@@ -33,5 +34,5 @@ printf '%s' '{"text":"name,age\\nAlice,30"}' \
 ## Verify Health
 
 ```bash
-curl -fsS http://127.0.0.1:8001/health
+curl -fsS http://127.0.0.1:18181/health
 ```
