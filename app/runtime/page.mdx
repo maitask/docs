@@ -26,6 +26,19 @@ Runtime is a Rust execution engine that runs task packages, exposes HTTP and gRP
 - resource tier operations
 - adapter output endpoints
 
+## Host inventory
+
+Each managed worker sends a `maitask.host/v1` report on its heartbeat. The report covers the operating system, CPU, memory, swap, filesystems, and network counters. Linux nodes read `/proc`, including `x86_64` and `aarch64`. macOS and Windows nodes use the same schema. `os.arch` is the machine architecture and `runtime.arch` is the running binary. An unsupported operating system is recorded as `collector: "unavailable"` and does not include invented resource numbers. Additional collector data belongs in `extensions`.
+
+Plane keeps the latest report on the runtime node and records a throttled observation history. Sampling interval and retention are runtime policy. The administration host page, separate from the node detail dialog, shows the current report and charts. Diagnostic commands and logs open in their own dialogs.
+
+An administrator can queue a diagnostic operation for that node. The worker runs it on a later heartbeat and posts the result back.
+
+- `read_log` follows the node. Linux reads the `maitask-runtime.service` journal or a file under `/var/log`. macOS reads the unified log or a file under `/var/log`. Windows reads the Application or System event log.
+- `exec` runs one allowlisted read-only command for that operating system. Linux includes `df`, `free`, `uptime`, `ps`, `ss`, `ip`, `dmesg`, `journalctl`, and `systemctl status|show|is-active`. macOS includes `df`, `uptime`, `ps`, `vm_stat`, `ifconfig`, `netstat`, `sysctl`, and `log show`. Windows includes `tasklist`, `systeminfo`, `ipconfig`, `netstat`, and `wevtutil`. There is no shell. The child process does not inherit the worker environment.
+
+The worker checks the same catalog before it starts a process. Plane stores the request, result, and an audit event. A node keeps at most five operations waiting.
+
 ## Deployment Boundary
 
 - Managed Runtime HTTP operations require service HMAC authentication.
